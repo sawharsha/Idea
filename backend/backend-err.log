@@ -1,0 +1,10 @@
+Error: Only one idea submission is allowed per active alternate-week cycle.
+    at createIdea (C:\Users\DELL\OneDrive\Desktop\idea\backend\src\controllers\idea.controller.js:95:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  statusCode: 400
+}
+Error: Only one idea submission is allowed per active alternate-week cycle.
+    at createIdea (C:\Users\DELL\OneDrive\Desktop\idea\backend\src\controllers\idea.controller.js:95:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  statusCode: 400
+}
