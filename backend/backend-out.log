@@ -6,3 +6,30 @@
 MongoDB Connected: ac-drj6tb6-shard-00-00.csaxfap.mongodb.net
 Admin already exists
 Server running on port 5000
+[0mGET / [32m200[0m 10.282 ms - 65[0m
+[0mGET /ideas [33m401[0m 2.045 ms - 77[0m
+[0mPOST /auth/login [32m200[0m 428.992 ms - 391[0m
+[0mGET /ideas [32m200[0m 197.113 ms - 3669[0m
+[0mGET /ideas [32m200[0m 150.517 ms - 3669[0m
+[0mGET /ideas [36m304[0m 134.605 ms - -[0m
+[0mGET /ideas?mine=true [32m200[0m 136.313 ms - 3669[0m
+[0mGET /ideas?mine=true [36m304[0m 127.301 ms - -[0m
+[0mGET /winners/April%202026%20Cycle%202 [32m200[0m 48.695 ms - 166[0m
+[0mGET /winners/April%202026%20Cycle%202 [36m304[0m 37.458 ms - -[0m
+[0mGET /winners/weeks [32m200[0m 106.861 ms - 124[0m
+[0mGET /ideas?limit=1000 [32m200[0m 151.597 ms - 3671[0m
+[0mGET /winners/weeks [36m304[0m 97.583 ms - -[0m
+[0mGET /ideas?limit=1000 [36m304[0m 139.929 ms - -[0m
+[0mGET /winners/April%20Week%204 [36m304[0m 156.257 ms - -[0m
+[0mGET /dashboard/stats [32m200[0m 146.298 ms - 294[0m
+[0mGET /ideas?limit=1000 [36m304[0m 166.356 ms - -[0m
+[0mGET /ideas?limit=1000 [36m304[0m 142.592 ms - -[0m
+[0mGET /dashboard/stats [36m304[0m 151.584 ms - -[0m
+[0mGET /ideas?limit=1000 [36m304[0m 542.842 ms - -[0m
+[0mGET /dashboard/stats [36m304[0m 567.333 ms - -[0m
+[0mGET /ideas?limit=1000 [36m304[0m 124.073 ms - -[0m
+[0mGET /dashboard/stats [36m304[0m 124.575 ms - -[0m
+[0mGET /ideas?limit=1000 [36m304[0m 405.665 ms - -[0m
+[0mGET /dashboard/stats [36m304[0m 415.296 ms - -[0m
+[0mGET /dashboard/stats [36m304[0m 133.815 ms - -[0m
+[0mGET /ideas?limit=1000 [36m304[0m 139.773 ms - -[0m
