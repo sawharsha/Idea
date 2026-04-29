@@ -19,8 +19,9 @@ body {
 }
 
 html {
+  font-size: 16px;
   scroll-behavior: smooth;
-  @apply overflow-x-hidden overflow-y-auto;
+  @apply overflow-x-hidden w-full;
 }
 
 #root {

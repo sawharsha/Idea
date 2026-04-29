@@ -19,7 +19,7 @@ export default function AppInput({
           </div>
         )}
         <input
-          className={`w-full rounded-2xl border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-6 py-5 text-base font-black text-[#0B1220] outline-none transition-all duration-500 focus:border-[#D4AF37] focus:ring-8 focus:ring-[#D4AF37]/10 focus:bg-white placeholder:text-[#1F2937]/20 shadow-sm ${icon ? 'pl-16' : ''} ${className}`}
+          className={`w-full rounded-lg border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-4 py-3 text-sm font-medium text-[#0B1220] outline-none transition-all duration-300 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/10 focus:bg-white placeholder:text-[#1F2937]/30 shadow-sm ${icon ? 'pl-12' : ''} ${className}`}
           {...props}
         />
       </div>

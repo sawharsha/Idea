@@ -303,49 +303,49 @@ export default function WinnersPage() {
     <div className="min-h-screen w-full bg-[#F8F5EF] text-[#1F2937] font-sans tracking-tight overflow-x-hidden selection:bg-[#D4AF37]/20 selection:text-[#0B1220]">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-16 animate-fade-in">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6 md:space-y-8 animate-fade-in">
         
         {/* Hero Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 rounded-[3rem] bg-[#0B1220] border border-[#D4AF37]/20 shadow-[0_40px_100px_rgba(11,18,32,0.4)] p-8 md:p-14 overflow-hidden relative group animate-fade-up">
+        <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-6 md:gap-8 rounded-[2rem] bg-[#0B1220] border border-[#D4AF37]/20 shadow-lg p-6 md:p-8 min-h-[280px] md:min-h-[340px] overflow-hidden relative group animate-fade-up">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.1),transparent_40%)] pointer-events-none" />
-          <div className="space-y-8 relative z-10">
-            <div className="space-y-4">
-              <p className="text-[11px] font-black uppercase tracking-[0.5em] text-[#D4AF37] flex items-center gap-3 animate-pulse">
-                <Sparkles size={16} /> Winners Circle
+          <div className="space-y-6 relative z-10">
+            <div className="space-y-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] flex items-center gap-2">
+                <Sparkles size={14} /> Winners Circle
               </p>
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-white leading-[0.9] italic">Weekly <span className="text-[#D4AF37] not-italic">Champions.</span></h1>
-              <div className="h-2 w-20 bg-[#D4AF37] rounded-full mt-6" />
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight italic">Weekly <span className="text-[#D4AF37] not-italic">Champions.</span></h1>
+              <div className="h-1 w-12 bg-[#D4AF37] rounded-full mt-4" />
             </div>
-            <p className="max-w-xl text-lg sm:text-xl text-white/60 font-bold leading-relaxed italic">Celebrating the best ideas. View the winners of every cycle.</p>
+            <p className="max-w-xl text-base sm:text-lg text-white/60 font-medium leading-relaxed italic">Celebrating the best ideas. View the winners of every cycle.</p>
           </div>
-          <div className="relative h-64 md:h-80 lg:h-[400px] overflow-hidden rounded-[2.5rem] border border-[#D4AF37]/20 bg-[#111827] shadow-2xl group/hero">
-            <img src={winnersHero} alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-95 transition-transform duration-[2000ms] group-hover/hero:scale-110" />
+          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-xl border border-[#D4AF37]/20 bg-[#111827] shadow-xl group/hero">
+            <img src={winnersHero} alt="" className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover object-center opacity-95 transition-transform duration-[2000ms] group-hover/hero:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-tr from-[#0B1220]/70 via-transparent to-[#D4AF37]/15 pointer-events-none" />
           </div>
         </section>
 
         {/* Selection Bar */}
-        <section className="bg-white/95 rounded-[2.5rem] border border-[#0B1220]/10 shadow-2xl p-6 md:p-8 animate-fade-up">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-            <div className="flex items-center gap-6">
-              <div className="h-16 w-16 rounded-[1.5rem] bg-[#F8F5EF] text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/20 shadow-lg group">
-                <History size={28} className="transition-transform group-hover:rotate-12 duration-500" />
+        <section className="bg-white/95 rounded-2xl md:rounded-3xl border border-[#0B1220]/10 shadow-lg p-4 md:p-5 animate-fade-up">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-lg bg-[#F8F5EF] text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/20 shadow-sm group">
+                <History size={24} className="transition-transform group-hover:rotate-6 duration-300" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#D4AF37] mb-1">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-[#D4AF37] mb-0.5">
                   Select Cycle
                 </p>
-                <p className="text-xl font-black text-[#0B1220] tracking-tight">
+                <p className="text-lg font-bold text-[#0B1220] tracking-tight">
                   {selectedCycle ? selectedCycle.label : "Loading..."}
                 </p>
               </div>
             </div>
-
-            <div className="relative group min-w-[320px]">
+ 
+            <div className="relative group min-w-[280px]">
               <select
                 value={selectedCycleValue}
                 onChange={(e) => setSelectedCycleValue(e.target.value)}
-                className="w-full rounded-2xl border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-8 py-5 text-xs font-black uppercase tracking-[0.2em] text-[#0B1220] outline-none transition-all duration-500 focus:border-[#D4AF37] focus:ring-8 focus:ring-[#D4AF37]/10 focus:bg-white cursor-pointer shadow-sm appearance-none"
+                className="w-full rounded-lg border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-[#0B1220] outline-none transition-all duration-300 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/10 focus:bg-white cursor-pointer shadow-sm appearance-none"
               >
                 {cycles.map((cycle) => (
                   <option key={cycle.label} value={cycle.label}>
@@ -353,8 +353,8 @@ export default function WinnersPage() {
                   </option>
                 ))}
               </select>
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-[#D4AF37]">
-                <Calendar size={20} />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#D4AF37]">
+                <Calendar size={18} />
               </div>
             </div>
           </div>
@@ -371,37 +371,37 @@ export default function WinnersPage() {
           <div className="space-y-20">
             <WinnerResultCard result={winnerResult} selectedCycle={selectedCycle} />
 
-            <section className="space-y-12 animate-fade-up">
-              <div className="flex items-center justify-between gap-6 px-4">
-                <div className="space-y-2">
-                   <p className="text-[11px] font-black uppercase tracking-[0.5em] text-[#D4AF37]">Past Winners</p>
-                   <h2 className="text-3xl md:text-5xl font-black text-[#0B1220] tracking-tighter">Previous Winners</h2>
-                   <div className="h-1.5 w-12 bg-[#D4AF37] rounded-full" />
+            <section className="space-y-8 animate-fade-up">
+              <div className="flex items-center justify-between gap-4 px-2">
+                <div className="space-y-1">
+                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37]">Past Winners</p>
+                   <h2 className="text-2xl md:text-3xl font-black text-[#0B1220] tracking-tight">Previous Winners</h2>
+                   <div className="h-1 w-8 bg-[#D4AF37] rounded-full" />
                 </div>
-                <Calendar className="text-[#D4AF37]/30" size={48} />
+                <Calendar className="text-[#D4AF37]/30" size={32} />
               </div>
 
               {previousWinners.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {previousWinners.map((winner) => (
-                    <div key={winner.idea._id} className="group rounded-[2.5rem] bg-white/95 border border-[#0B1220]/10 p-8 flex items-center gap-8 hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(11,18,32,0.15)] transition-all duration-500 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full pointer-events-none transition-transform duration-700 group-hover:scale-150" />
-                      <div className="relative h-20 w-20 shrink-0 rounded-[1.5rem] overflow-hidden border-2 border-[#D4AF37]/20 p-1 bg-[#F8F5EF] shadow-xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                    <div key={winner.idea._id} className="group rounded-2xl md:rounded-3xl bg-white/95 border border-[#0B1220]/10 p-4 md:p-5 flex items-center gap-4 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full pointer-events-none" />
+                      <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden border border-[#D4AF37]/20 p-0.5 bg-[#F8F5EF] shadow-sm">
                         <img
                           src={winner.idea?.createdBy?.photoUrl || `https://ui-avatars.com/api/?background=FFFFFF&color=0B1220&size=256&name=${encodeURIComponent(winner.idea?.createdBy?.name || "Winner")}`}
-                          className="h-full w-full rounded-[1.25rem] object-cover"
+                          className="h-full w-full rounded-md object-cover"
                           alt=""
                         />
                       </div>
                       <div className="min-w-0 flex-1 relative z-10">
-                        <p className="text-base font-black text-[#0B1220] truncate group-hover:text-[#D4AF37] transition-colors">
+                        <p className="text-sm font-bold text-[#0B1220] truncate group-hover:text-[#D4AF37] transition-colors">
                           {winner.idea?.createdBy?.name || "Unknown User"}
                         </p>
-                        <p className="text-[11px] font-bold text-[#1F2937]/40 truncate mt-1 italic leading-relaxed">
+                        <p className="text-[10px] font-medium text-[#1F2937]/40 truncate mt-0.5 italic leading-relaxed">
                           "{winner.idea?.title || "Winning idea"}"
                         </p>
-                        <div className="inline-flex items-center gap-2 mt-4 px-3 py-1 rounded-full bg-[#D4AF37] text-[#0B1220] text-[10px] font-black shadow-lg">
-                          <Vote size={12} /> {winner.votes || 0}
+                        <div className="inline-flex items-center gap-1.5 mt-3 px-2 py-0.5 rounded-full bg-[#D4AF37] text-[#0B1220] text-[9px] font-bold">
+                          <Vote size={10} /> {winner.votes || 0}
                         </div>
                       </div>
                     </div>
@@ -426,25 +426,25 @@ export default function WinnersPage() {
 function WinnerResultCard({ result, selectedCycle }) {
   if (result.status !== "winner") {
     return (
-      <section className="rounded-[3.5rem] bg-white/95 border border-[#D4AF37]/20 shadow-[0_40px_120px_rgba(11,18,32,0.15)] p-10 md:p-20 min-h-[480px] flex flex-col items-center justify-center text-center animate-fade-up relative overflow-hidden group">
+      <section className="rounded-2xl md:rounded-3xl bg-white/95 border border-[#D4AF37]/20 shadow-lg p-6 md:p-8 min-h-[280px] md:min-h-[340px] flex flex-col items-center justify-center text-center animate-fade-up relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.05),transparent_60%)] pointer-events-none" />
         <div className="relative">
-          <div className="absolute -inset-10 bg-[#D4AF37]/10 blur-3xl rounded-full animate-pulse" />
-          <div className="relative h-32 w-32 rounded-full bg-[#F8F5EF] text-[#D4AF37]/40 flex items-center justify-center border border-[#D4AF37]/20 mb-10 shadow-inner group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700">
-            <Trophy size={64} />
+          <div className="absolute -inset-8 bg-[#D4AF37]/10 blur-3xl rounded-full" />
+          <div className="relative h-20 w-20 rounded-full bg-[#F8F5EF] text-[#D4AF37]/40 flex items-center justify-center border border-[#D4AF37]/20 mb-6 shadow-inner group-hover:scale-110 transition-transform">
+            <Trophy size={40} />
           </div>
         </div>
-        <h2 className="text-3xl md:text-5xl font-black text-[#0B1220] tracking-tighter leading-tight relative z-10">
+        <h2 className="text-2xl md:text-3xl font-black text-[#0B1220] tracking-tight leading-tight relative z-10">
           {result.message}
         </h2>
         {result.status === "tie" && (
-          <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full relative z-10 animate-fade-in">
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full relative z-10 animate-fade-in">
             {result.tiedIdeas.map((idea) => (
-              <div key={idea._id} className="group/tie rounded-[2rem] bg-[#F8F5EF]/80 border border-[#0B1220]/5 p-6 flex items-center gap-6 text-left hover:bg-white hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-                <img src={getUserPhoto(idea)} className="h-16 w-16 rounded-[1.25rem] object-cover border-2 border-[#D4AF37]/20 shadow-lg group-hover/tie:rotate-3 transition-transform" alt="" />
+              <div key={idea._id} className="group/tie rounded-xl bg-[#F8F5EF]/80 border border-[#0B1220]/5 p-4 flex items-center gap-4 text-left hover:bg-white hover:shadow-md transition-all duration-300">
+                <img src={getUserPhoto(idea)} className="h-12 w-12 rounded-lg object-cover border border-[#D4AF37]/20 shadow-sm" alt="" />
                 <div className="min-w-0">
-                  <p className="text-base font-black text-[#0B1220] truncate">{getUserName(idea)}</p>
-                  <p className="text-[11px] font-bold text-[#1F2937]/45 truncate italic mt-1 leading-relaxed">"{idea.title}"</p>
+                  <p className="text-sm font-bold text-[#0B1220] truncate">{getUserName(idea)}</p>
+                  <p className="text-[10px] font-medium text-[#1F2937]/45 truncate italic mt-0.5 leading-relaxed">"{idea.title}"</p>
                 </div>
               </div>
             ))}
@@ -457,72 +457,72 @@ function WinnerResultCard({ result, selectedCycle }) {
   const idea = result.idea;
 
   return (
-    <section className="rounded-[4rem] bg-white/95 border border-[#D4AF37]/30 shadow-[0_50px_150px_rgba(11,18,32,0.2)] p-8 md:p-16 overflow-hidden relative animate-fade-up group">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#0B1220]/5 translate-y-1/2 -translate-x-1/2 rounded-full blur-[100px] pointer-events-none" />
+    <section className="rounded-2xl bg-white/95 border border-[#D4AF37]/30 shadow-xl p-6 md:p-10 overflow-hidden relative animate-fade-up group">
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#0B1220]/5 translate-y-1/2 -translate-x-1/2 rounded-full blur-[80px] pointer-events-none" />
       
-      <div className="relative grid grid-cols-1 lg:grid-cols-[400px_minmax(0,1fr)] gap-16 items-center">
+      <div className="relative grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] gap-10 items-center">
         <div className="relative flex items-center justify-center group/winner">
-          <div className="absolute inset-0 rounded-full bg-[#D4AF37]/15 blur-3xl animate-pulse" />
-          <div className="relative rounded-[3rem] bg-gradient-to-br from-[#D4AF37] via-[#F8F5EF] to-[#0B1220] p-2 shadow-[0_40px_100px_rgba(212,175,55,0.3)] transition-transform duration-700 group-hover/winner:scale-[1.02]">
+          <div className="absolute inset-0 rounded-full bg-[#D4AF37]/10 blur-2xl" />
+          <div className="relative rounded-2xl bg-gradient-to-br from-[#D4AF37] via-[#F8F5EF] to-[#0B1220] p-1.5 shadow-lg">
             <img
               src={getUserPhoto(idea)}
-              className="h-72 w-72 md:h-96 md:w-96 rounded-[2.75rem] object-cover border-8 border-white shadow-inner"
+              className="h-48 w-48 md:h-64 md:w-64 rounded-xl object-cover border-4 border-white"
               alt=""
             />
           </div>
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 rounded-[2rem] bg-[#0B1220] text-[#D4AF37] border-8 border-white h-24 w-24 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.4)] transition-all duration-500 group-hover/winner:scale-125 group-hover/winner:rotate-12">
-            <Crown size={48} />
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-[#0B1220] text-[#D4AF37] border-4 border-white h-16 w-16 flex items-center justify-center shadow-md transition-all duration-300 group-hover/winner:scale-110">
+            <Crown size={32} />
           </div>
         </div>
 
-        <div className="space-y-10 text-center lg:text-left relative z-10">
-          <div className="inline-flex items-center gap-3 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 px-6 py-3 text-[#D4AF37] shadow-xl">
-            <Sparkles size={20} className="animate-spin-slow" />
-            <span className="text-[11px] font-black uppercase tracking-[0.4em]">
+        <div className="space-y-6 text-center lg:text-left relative z-10">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 px-4 py-2 text-[#D4AF37] shadow-sm">
+            <Sparkles size={16} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">
               {result.selectionType === "manual" ? "Admin Final Winner" : "Weekly Champion"}
             </span>
           </div>
 
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-7xl font-black text-[#0B1220] tracking-tighter leading-[0.9]">
+          <div className="space-y-2">
+            <h2 className="text-3xl md:text-5xl font-bold text-[#0B1220] tracking-tight leading-tight">
               {getUserName(idea)}
             </h2>
-            <div className="flex items-center justify-center lg:justify-start gap-3 text-base font-bold text-[#1F2937]/45 tracking-widest italic uppercase">
-               <div className="h-px w-8 bg-[#D4AF37]/40" /> {getUserDepartment(idea)}
+            <div className="flex items-center justify-center lg:justify-start gap-2 text-sm font-medium text-[#1F2937]/45 tracking-wider italic uppercase">
+               <div className="h-px w-6 bg-[#D4AF37]/40" /> {getUserDepartment(idea)}
             </div>
           </div>
 
-          <div className="rounded-[2.5rem] bg-[#F8F5EF]/80 border border-[#0B1220]/5 p-8 md:p-12 shadow-inner group/idea transition-all duration-500 hover:bg-white hover:shadow-2xl hover:-translate-y-1">
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#D4AF37] mb-5">
+          <div className="rounded-xl bg-[#F8F5EF]/80 border border-[#0B1220]/5 p-6 md:p-8 shadow-inner group/idea transition-all duration-300 hover:bg-white hover:shadow-md">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-[#D4AF37] mb-3">
               Winning Idea
             </p>
-            <h3 className="text-3xl md:text-4xl font-black text-[#0B1220] tracking-tight group-hover:text-[#D4AF37] transition-colors duration-300">
+            <h3 className="text-xl md:text-2xl font-bold text-[#0B1220] tracking-tight group-hover:text-[#D4AF37] transition-colors">
               {idea?.title || "Untitled Idea"}
             </h3>
-            <p className="mt-6 text-base md:text-xl leading-relaxed text-[#1F2937]/65 font-bold italic">
+            <p className="mt-4 text-sm md:text-base leading-relaxed text-[#1F2937]/65 font-medium italic">
               "{idea?.description || "No description available."}"
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
-            <div className="rounded-[2.5rem] bg-[#0B1220] text-white p-8 flex items-center gap-6 shadow-[0_20px_50px_rgba(11,18,32,0.3)] transition-all duration-500 hover:-translate-y-2 group/stats">
-              <div className="h-16 w-16 rounded-[1.5rem] bg-[#D4AF37] text-[#0B1220] flex items-center justify-center shadow-2xl transition-transform duration-500 group-hover/stats:scale-110 group-hover/stats:rotate-6">
-                <Vote size={32} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+            <div className="rounded-xl bg-[#0B1220] text-white p-5 flex items-center gap-4 shadow-md transition-all duration-300 group/stats">
+              <div className="h-12 w-12 rounded-lg bg-[#D4AF37] text-[#0B1220] flex items-center justify-center shadow-sm transition-transform group-hover/stats:scale-110">
+                <Vote size={24} />
               </div>
               <div>
-                <p className="text-5xl font-black tracking-tighter leading-none">{result.votes}</p>
-                <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/40 mt-2">Votes</p>
+                <p className="text-3xl font-bold tracking-tight leading-none">{result.votes}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-white/40 mt-1">Votes</p>
               </div>
             </div>
 
-            <div className="rounded-[2.5rem] bg-[#F8F5EF] border border-[#0B1220]/10 p-8 flex items-center gap-6 shadow-xl transition-all duration-500 hover:-translate-y-2 group/cycle">
-              <div className="h-16 w-16 rounded-[1.5rem] bg-white text-[#D4AF37] flex items-center justify-center border-2 border-[#D4AF37]/20 shadow-lg transition-transform duration-500 group-hover/cycle:scale-110 group-hover/cycle:rotate-6">
-                <Calendar size={32} />
+            <div className="rounded-xl bg-[#F8F5EF] border border-[#0B1220]/10 p-5 flex items-center gap-4 shadow-sm transition-all duration-300 group/cycle">
+              <div className="h-12 w-12 rounded-lg bg-white text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/20 shadow-sm transition-transform group-hover/cycle:scale-110">
+                <Calendar size={24} />
               </div>
               <div>
-                <p className="text-base font-black text-[#0B1220] tracking-tight">{formatCycleLabel(selectedCycle)}</p>
-                <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#1F2937]/35 mt-2">Winning Cycle</p>
+                <p className="text-sm font-bold text-[#0B1220] tracking-tight">{formatCycleLabel(selectedCycle)}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#1F2937]/35 mt-1">Winning Cycle</p>
               </div>
             </div>
           </div>
