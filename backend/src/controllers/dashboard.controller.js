@@ -115,6 +115,10 @@ const getWeeklyWinnerSummary = async (req, res) => {
   const topIdeas = ideas.filter((idea) => (idea.likesCount || 0) === topVotes);
 
   if (topIdeas.length > 1) {
+    const formattedTopIdeas = topIdeas.map((idea, index) =>
+      formatWinnerIdea(idea, index + 1)
+    );
+
     return res.status(200).json(
       successResponse(
         "Multiple ideas have the same top votes. Admin must select the final winner.",
@@ -122,9 +126,8 @@ const getWeeklyWinnerSummary = async (req, res) => {
           weekLabel: currentWeekLabel,
           isTie: true,
           winnerPending: true,
-          tieCandidates: topIdeas.map((idea, index) =>
-            formatWinnerIdea(idea, index + 1)
-          ),
+          topIdeas: formattedTopIdeas,
+          tieCandidates: formattedTopIdeas,
           winners: [],
         }
       )

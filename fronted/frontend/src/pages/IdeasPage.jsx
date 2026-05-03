@@ -1,9 +1,17 @@
 import { useEffect, useState, useMemo } from "react";
-import { Search, Lightbulb, Filter, X, History, TrendingUp, Trophy, Calendar, Sparkles, Edit, Vote as VoteIcon } from "lucide-react";
+import { Search, Lightbulb, Filter, X, History, TrendingUp, Trophy, Calendar, Sparkles, Edit, Vote as VoteIcon, Trash2 } from "lucide-react";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import IdeaModal from "../components/IdeaModal";
 import { useAuth } from "../context/AuthContext";
+import {
+  isSubmissionOpenForIdea,
+  isVotingOpenForIdea,
+  isOwnIdea,
+  hasUserVotedThisIdea,
+  hasUserVotedInCycle,
+} from "../utils/cycleHelper";
+import { getVoteButtonDisplay } from "../utils/voteButtonDisplay";
 
 // --- Helpers ---
 
@@ -53,6 +61,15 @@ const getVoteCount = (idea) => {
 
 const getIdeaDate = (idea) => idea?.createdAt || idea?.submittedAt;
 
+const getOwnerId = (idea) =>
+  idea.user?._id ||
+  idea.userId?._id ||
+  idea.userId ||
+  idea.createdBy?._id ||
+  idea.createdBy ||
+  idea.author?._id ||
+  idea.author;
+
 const isIdeaInCycle = (idea, cycle) => {
   if (!idea || !cycle) return false;
   const date = new Date(getIdeaDate(idea));
@@ -89,16 +106,7 @@ const findCurrentCycle = () => {
 };
 
 const canVote = (idea) => {
-  const cycle = findCycleForIdea(idea);
-  if (!cycle) return false;
-  const now = new Date();
-  return now >= cycle.votingStart && now <= cycle.votingEnd;
-};
-
-const canEdit = (idea) => {
-  const cycle = findCycleForIdea(idea);
-  if (!cycle) return false;
-  return new Date() <= cycle.submissionClose;
+  return isVotingOpenForIdea(idea);
 };
 
 // --- Component ---
@@ -106,6 +114,19 @@ const canEdit = (idea) => {
 export default function IdeasPage() {
   const { userInfo } = useAuth();
   const currentUser = userInfo?.user;
+  const authUser = userInfo?.user;
+  const currentUserId =
+    currentUser?._id ||
+    currentUser?.id ||
+    userInfo?._id ||
+    userInfo?.id ||
+    authUser?._id ||
+    authUser?.id;
+  const isAdmin =
+    currentUser?.role === "admin" ||
+    currentUser?.role === "superadmin" ||
+    userInfo?.role === "admin" ||
+    userInfo?.role === "superadmin";
 
   const [ideas, setIdeas] = useState([]);
   const [cycles, setCycles] = useState([]);
@@ -163,10 +184,20 @@ export default function IdeasPage() {
 
   const handleVote = async (id) => {
     try {
-      await api.post(`/ideas/${id}/like`);
+      await api.put(`/ideas/${id}/like`);
       fetchIdeas();
     } catch (error) {
       console.error("Vote error:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/ideas/${id}`);
+      fetchIdeas();
+      if (selectedIdea?._id === id) setSelectedIdea(null);
+    } catch (error) {
+      console.error("Delete idea error:", error);
     }
   };
 
@@ -179,9 +210,12 @@ export default function IdeasPage() {
   };
 
   const isMyIdea = (idea) => {
-    const ownerId = idea.user?._id || idea.userId || idea.createdBy?._id || idea.createdBy;
-    const currentUserId = currentUser?.id || currentUser?._id;
-    return ownerId?.toString() === currentUserId?.toString();
+    return String(getOwnerId(idea)) === String(currentUserId);
+  };
+
+  const canDeleteIdea = (idea) => {
+    const isOwner = String(getOwnerId(idea)) === String(currentUserId);
+    return isAdmin || isOwner;
   };
 
   const matchesCategory = (idea) => {
@@ -245,13 +279,22 @@ export default function IdeasPage() {
   const categories = ["all", "Software", "Hardware"];
 
   const renderIdeaRow = (idea, rank = null, compact = false) => {
-    const voteStatus = canVote(idea);
-    const editStatus = isMyIdea(idea) && canEdit(idea);
-    const currentUserId = currentUser?.id || currentUser?._id;
-    const hasVoted = (idea.likes || idea.votes || []).includes(currentUserId);
+    const isOwner = isOwnIdea(idea, currentUserId);
+    const submissionOpen = isSubmissionOpenForIdea(idea);
+    const editStatus = isOwner && submissionOpen;
+    const votingOpen = isVotingOpenForIdea(idea);
+    const votedThisIdea = hasUserVotedThisIdea(idea, currentUserId);
+    const votedInCycle = hasUserVotedInCycle(idea, ideas, currentUserId);
+
+    const voteButtonDisplay = getVoteButtonDisplay({
+      isOwnIdea: isOwner,
+      hasUserVotedThisIdea: votedThisIdea,
+      hasUserVotedInCycle: votedInCycle,
+      isVotingOpen: votingOpen,
+    });
     if (compact) {
       return (
-        <div key={idea._id} className="p-3 rounded-xl bg-[#F8F5EF]/50 border border-[#0B1220]/5 hover:bg-white transition-all group cursor-pointer" onClick={() => setSelectedIdea(idea)}>
+        <div key={idea._id} className="p-3 rounded-xl bg-[#F8F5EF]/50 border border-[#0B1F3A]/10 hover:bg-white transition-all group cursor-pointer" onClick={() => setSelectedIdea(idea)}>
           <div className="flex items-start gap-3">
             {rank && <span className="text-base font-bold text-[#D4AF37] italic">#{rank}</span>}
             <div className="min-w-0 flex-1">
@@ -267,9 +310,9 @@ export default function IdeasPage() {
     }
 
     return (
-      <div key={idea._id} className="rounded-2xl md:rounded-3xl bg-white/95 border border-[#0B1220]/10 shadow-sm p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-6 transition-all duration-300 hover:shadow-md group animate-fade-up">
-        <div className="flex items-start gap-4 flex-1 min-w-0">
-          <div className="shrink-0 h-12 w-12 rounded-lg bg-[#F8F5EF] border border-[#D4AF37]/20 overflow-hidden relative shadow-sm">
+      <div key={idea._id} className="premium-card p-5 flex flex-col justify-between gap-6 group animate-fade-up hover:scale-[1.02]">
+        <div className="flex items-start gap-4 min-w-0">
+          <div className="shrink-0 h-12 w-12 rounded-2xl bg-[#F8F5EF] border border-[#D4AF37]/20 overflow-hidden relative shadow-sm">
             <img 
               src={idea.createdBy?.photoUrl || `https://ui-avatars.com/api/?background=F8F5EF&color=D4AF37&name=${encodeURIComponent(idea.createdBy?.name || "User")}`} 
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" alt=""
@@ -282,8 +325,8 @@ export default function IdeasPage() {
                 <Calendar size={10} /> {new Date(getIdeaDate(idea)).toLocaleDateString()}
               </span>
             </div>
-            <h3 className="text-lg font-bold text-[#0B1220] truncate cursor-pointer hover:text-[#D4AF37] transition-colors" onClick={() => setSelectedIdea(idea)}>{idea.title}</h3>
-            <p className="text-[#1F2937]/60 text-xs line-clamp-1 font-medium mt-1 italic leading-relaxed">"{idea.description}"</p>
+            <h3 className="text-lg font-semibold text-[#0B1220] line-clamp-2 cursor-pointer hover:text-[#D4AF37] transition-colors" onClick={() => setSelectedIdea(idea)}>{idea.title}</h3>
+            <p className="text-[#6B7280] text-sm line-clamp-3 font-medium mt-2 italic leading-relaxed">"{idea.description}"</p>
             <div className="flex items-center gap-3 mt-3">
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-[#1F2937]/40">
                 <div className="h-1.5 w-1.5 bg-[#D4AF37] rounded-full" /> {idea.createdBy?.name || "Anonymous User"}
@@ -292,37 +335,32 @@ export default function IdeasPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-[#0B1220]/5">
-          <div className="text-right mr-2">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#0B1F3A]/10">
+          <div>
             <p className="text-[8px] font-bold uppercase tracking-wider text-[#1F2937]/30 mb-0.5">Votes</p>
             <p className="text-xl font-bold text-[#0B1220] tracking-tight">{getVoteCount(idea)}</p>
           </div>
           
           <div className="flex items-center gap-2">
             {editStatus && (
-              <button onClick={(e) => { e.stopPropagation(); console.log("Edit idea", idea._id); }} className="h-10 w-10 flex items-center justify-center rounded-lg bg-[#0B1220]/5 text-[#0B1220] hover:bg-[#0B1220] hover:text-white transition-all border border-[#0B1220]/10 shadow-sm active:scale-95">
+              <button onClick={(e) => { e.stopPropagation(); console.log("Edit idea", idea._id); }} className="h-10 w-10 flex items-center justify-center rounded-2xl bg-[#0B1F3A]/5 text-[#0B1220] hover:bg-[#0B1F3A] hover:text-white transition-all duration-300 ease-out border border-[#0B1F3A]/10 shadow-sm hover:scale-105 active:scale-95">
                 <Edit size={16} />
+              </button>
+            )}
+
+            {isAdmin && (
+              <button onClick={(e) => { e.stopPropagation(); handleDelete(idea._id); }} className="h-10 w-10 flex items-center justify-center rounded-2xl bg-red-500/5 text-red-500/70 hover:bg-red-500 hover:text-white transition-all duration-300 ease-out border border-red-500/10 shadow-sm hover:scale-105 active:scale-95">
+                <Trash2 size={16} />
               </button>
             )}
             
             <button
               onClick={() => handleVote(idea._id)}
-              disabled={!voteStatus || hasVoted}
-              className={`h-10 px-6 rounded-lg flex flex-col items-center justify-center transition-all min-w-[110px] shadow-sm ${
-                hasVoted ? "bg-[#0B1220] text-white cursor-default" : 
-                voteStatus ? "bg-[#D4AF37] text-[#0B1220] hover:bg-[#0B1220] hover:text-white active:scale-95" : 
-                "bg-[#F8F5EF] text-[#1F2937]/20 border border-[#0B1220]/10 cursor-not-allowed shadow-none"
-              }`}
+              disabled={voteButtonDisplay.disabled}
+              className={`flex items-center justify-center gap-2 ${voteButtonDisplay.className}`}
             >
-              <div className="flex items-center gap-2 font-bold text-[10px] uppercase tracking-wider">
-                <VoteIcon size={14} className={(!hasVoted && voteStatus) ? "animate-pulse" : ""} />
-                {hasVoted ? "Voted" : voteStatus ? "Vote" : "Locked"}
-              </div>
-              {!voteStatus && !hasVoted && (
-                <span className="text-[7px] font-bold uppercase tracking-wider opacity-60 mt-0.5">
-                  {new Date() < findCycleForIdea(idea)?.votingStart ? "Opening Soon" : "Cycle Closed"}
-                </span>
-              )}
+              <VoteIcon size={14} className={!voteButtonDisplay.disabled ? "animate-pulse" : ""} />
+              {voteButtonDisplay.text}
             </button>
           </div>
         </div>
@@ -331,32 +369,32 @@ export default function IdeasPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F8F5EF] font-sans tracking-tight text-[#1F2937] overflow-x-hidden selection:bg-[#D4AF37]/20 selection:text-[#0B1220]">
+    <div className="premium-page">
       <Navbar />
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6 md:space-y-8 animate-fade-in">
+      <main className="premium-shell animate-fade-in">
         
         {/* Hero */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-6 md:gap-8 rounded-[2rem] bg-[#0B1220] border border-[#D4AF37]/20 shadow-lg p-6 md:p-8 min-h-[280px] md:min-h-[340px] overflow-hidden relative group">
+        <section className="premium-hero grid grid-cols-1 lg:grid-cols-2 items-center gap-8 min-h-[260px] md:min-h-[320px] group">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.1),transparent_40%)] pointer-events-none" />
           <div className="space-y-6 relative z-10">
             <div className="space-y-3">
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] flex items-center gap-2">
                 <Sparkles size={14} /> Global Idea Stream
               </p>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight italic">Explore <span className="text-[#D4AF37] not-italic">Ideas.</span></h1>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight italic">Explore <span className="text-[#D4AF37] not-italic">Ideas.</span></h1>
               <div className="h-1 w-12 bg-[#D4AF37] rounded-full mt-4" />
             </div>
-            <p className="max-w-xl text-base sm:text-lg text-white/60 font-medium leading-relaxed italic">Discover and vote on community ideas across every cycle.</p>
+            <p className="max-w-xl text-sm md:text-base text-white/70 font-medium leading-relaxed italic">Discover and vote on community ideas across every cycle.</p>
           </div>
-          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-xl border border-[#D4AF37]/20 bg-[#111827] shadow-xl group/hero">
+          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#111827] shadow-2xl group/hero">
             <img src="/assests/ideapage.png" alt="" className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover object-center opacity-95 transition-transform duration-[2000ms] group-hover/hero:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-tr from-[#0B1220]/70 via-transparent to-[#D4AF37]/15 pointer-events-none" />
           </div>
         </section>
 
         {/* Filter Bar */}
-        <section className="bg-white/95 rounded-xl border border-[#0B1220]/10 shadow-lg p-3 grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_auto] gap-3 relative z-40 items-center animate-fade-up">
+        <section className="premium-card p-3 md:p-4 grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_auto] gap-3 relative z-40 items-center animate-fade-up">
           <div className="relative group h-12">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D4AF37] transition-transform duration-300" size={18} />
             <input
@@ -365,29 +403,29 @@ export default function IdeasPage() {
               value={search}
               onChange={(e) => { setSearch(e.target.value); setShowSuggestions(true); }}
               onFocus={() => setShowSuggestions(true)}
-              className="w-full h-full pl-12 pr-6 bg-[#F8F5EF]/70 border border-transparent rounded-lg outline-none text-xs font-bold text-[#0B1220] placeholder:text-[#1F2937]/20 focus:border-[#D4AF37]/30 focus:ring-4 focus:ring-[#D4AF37]/10 transition-all duration-300"
+              className="w-full h-full pl-12 pr-6 premium-input rounded-2xl text-xs font-bold placeholder:text-[#6B7280]/60"
             />
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white/98 backdrop-blur-xl rounded-lg shadow-xl border border-[#0B1220]/10 z-50 overflow-hidden animate-scale-in">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white/98 backdrop-blur-xl rounded-2xl shadow-xl border border-[#0B1F3A]/10 z-50 overflow-hidden animate-scale-in">
                 {suggestions.map((s, i) => (
-                  <button key={i} className="w-full text-left px-6 py-3 hover:bg-[#F8F5EF] text-[10px] font-bold uppercase tracking-wider text-[#0B1220] transition-colors border-b border-[#0B1220]/5 last:border-none" onClick={() => { setSearch(s); setShowSuggestions(false); }}>{s}</button>
+                  <button key={i} className="w-full text-left px-6 py-3 hover:bg-[#F8F5EF] text-[10px] font-bold uppercase tracking-wider text-[#0B1220] transition-colors border-b border-[#0B1F3A]/10 last:border-none" onClick={() => { setSearch(s); setShowSuggestions(false); }}>{s}</button>
                 ))}
               </div>
             )}
           </div>
-          <div className="flex items-center gap-3 px-4 bg-[#F8F5EF]/70 rounded-lg border border-[#0B1220]/5 h-12 group transition-all duration-300 focus-within:border-[#D4AF37]/30 focus-within:bg-white">
+          <div className="flex items-center gap-3 px-4 rounded-2xl premium-input h-12 group">
             <Filter size={16} className="text-[#D4AF37] group-hover:rotate-6 transition-transform" />
             <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full bg-transparent text-[10px] font-bold uppercase tracking-wider text-[#0B1220] outline-none cursor-pointer h-full">
               {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All Categories' : c}</option>)}
             </select>
           </div>
-          <div className="flex items-center gap-3 px-4 bg-[#F8F5EF]/70 rounded-lg border border-[#0B1220]/5 h-12 group transition-all duration-300 focus-within:border-[#D4AF37]/30 focus-within:bg-white">
+          <div className="flex items-center gap-3 px-4 rounded-2xl premium-input h-12 group">
             <History size={16} className="text-[#D4AF37] group-hover:rotate-6 transition-transform" />
             <select value={selectedCycle} onChange={(e) => setSelectedCycle(e.target.value)} className="w-full bg-transparent text-[10px] font-bold uppercase tracking-wider text-[#0B1220] outline-none cursor-pointer h-full">
               {cycles.map((c, i) => <option key={i} value={c.value}>{c.label}</option>)}
             </select>
           </div>
-          <button onClick={handleClear} className="h-12 w-12 flex items-center justify-center bg-white text-[#1F2937]/30 rounded-lg border border-[#0B1220]/5 hover:text-[#0B1220] hover:border-[#D4AF37]/40 transition-all duration-300 active:scale-95 shadow-sm"><X size={20} /></button>
+          <button onClick={handleClear} className="h-12 w-12 flex items-center justify-center bg-white text-[#1F2937]/30 rounded-2xl border border-[#0B1F3A]/10 hover:text-[#0B1220] hover:border-[#D4AF37]/40 transition-all duration-300 ease-out hover:scale-105 active:scale-95 shadow-sm"><X size={20} /></button>
         </section>
  
         {/* Main Content Grid */}
@@ -398,21 +436,21 @@ export default function IdeasPage() {
             <div className="flex items-center gap-3 px-2">
               <div className="p-2 bg-white rounded-xl shadow-md border border-[#D4AF37]/20 text-[#D4AF37]"><Calendar size={18} /></div>
               <div className="space-y-0.5">
-                <h2 className="text-xl font-bold tracking-tight text-[#0B1220]">Idea Feed</h2>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#0B1220]">Idea Feed</h2>
                 <div className="h-1 w-8 bg-[#D4AF37] rounded-full" />
               </div>
             </div>
 
             {loading ? (
               <div className="space-y-8 animate-pulse">
-                {[1, 2, 3].map(i => <div key={i} className="h-44 bg-white rounded-[2.5rem] border border-[#0B1220]/10" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-44 bg-white rounded-[2.5rem] border border-[#0B1F3A]/10" />)}
               </div>
             ) : (
-              <div className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {allIdeasFeed.length > 0 ? (
                   allIdeasFeed.map(idea => renderIdeaRow(idea))
                 ) : (
-                  <div className="min-h-[300px] bg-white rounded-[3rem] border-2 border-dashed border-[#D4AF37]/20 py-20 px-10 text-center flex flex-col items-center justify-center shadow-inner group transition-all duration-700 hover:border-[#D4AF37]/40">
+                  <div className="md:col-span-2 xl:col-span-3 min-h-[240px] bg-white rounded-3xl border-2 border-dashed border-[#D4AF37]/20 py-14 px-6 md:px-10 text-center flex flex-col items-center justify-center shadow-inner group transition-all duration-300 ease-out hover:border-[#D4AF37]/40">
                     <div className="h-20 w-20 bg-[#F8F5EF] rounded-full flex items-center justify-center text-[#D4AF37]/20 mb-8 group-hover:scale-110 transition-transform duration-500">
                       <Lightbulb size={48} />
                     </div>
@@ -426,19 +464,19 @@ export default function IdeasPage() {
           {/* Sidebar */}
           <aside className="w-full xl:sticky xl:top-24 space-y-8 animate-fade-up">
             {/* Tabs Toggle */}
-            <div className="flex items-center gap-2 rounded-xl bg-white/95 border border-[#0B1220]/10 shadow-lg p-2 h-14">
+            <div className="flex items-center gap-2 rounded-3xl bg-white/95 border border-[#0B1F3A]/10 shadow-lg p-2 h-14">
               <button
                 onClick={() => setActiveTab("top")}
-                className={`flex-1 h-full rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all duration-300 ${
-                  activeTab === "top" ? "bg-[#0B1220] text-white shadow-md" : "text-[#0B1220] hover:bg-[#0B1220]/5"
+                className={`flex-1 h-full rounded-full font-bold text-[10px] uppercase tracking-wider transition-all duration-300 ease-out ${
+                  activeTab === "top" ? "bg-[#0B1F3A] text-white shadow-md" : "text-[#0B1220] hover:bg-[#0B1F3A]/5"
                 }`}
               >
                 Global Top
               </button>
               <button
                 onClick={() => setActiveTab("trending")}
-                className={`flex-1 h-full rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all duration-300 ${
-                  activeTab === "trending" ? "bg-[#0B1220] text-white shadow-md" : "text-[#0B1220] hover:bg-[#0B1220]/5"
+                className={`flex-1 h-full rounded-full font-bold text-[10px] uppercase tracking-wider transition-all duration-300 ease-out ${
+                  activeTab === "trending" ? "bg-[#0B1F3A] text-white shadow-md" : "text-[#0B1220] hover:bg-[#0B1F3A]/5"
                 }`}
               >
                 Trending
@@ -446,7 +484,7 @@ export default function IdeasPage() {
             </div>
 
             {/* Sidebar Content */}
-            <div className="rounded-xl bg-white/95 border border-[#0B1220]/10 shadow-lg p-5 space-y-6 animate-fade-in">
+          <div className="premium-card p-5 space-y-6 animate-fade-in">
               <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar space-y-4">
                 {activeTab === "top" && (
                   <>
@@ -496,7 +534,7 @@ export default function IdeasPage() {
         </div>
       </main>
 
-      <IdeaModal idea={selectedIdea} onClose={() => setSelectedIdea(null)} onVote={handleVote} />
+      <IdeaModal idea={selectedIdea} onClose={() => setSelectedIdea(null)} onVote={handleVote} allIdeas={ideas} />
     </div>
   );
 }

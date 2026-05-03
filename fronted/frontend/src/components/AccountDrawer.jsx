@@ -68,29 +68,29 @@ export default function AccountDrawer({ open, onClose }) {
     }
   };
 
-  const inputWrap = "flex items-center gap-3 rounded-2xl border border-[#C9A227]/10 bg-white px-5 py-4 transition-all duration-500 focus-within:border-[#C9A227] focus-within:ring-4 focus-within:ring-[#C9A227]/5";
-  const inputField = "w-full bg-transparent text-sm font-bold text-[#0F3D2E] outline-none placeholder:text-[#222222]/20";
-  const labelClass = "text-[10px] font-black uppercase tracking-[0.2em] text-[#222222]/40 ml-1";
+  const inputWrap = "flex items-center gap-3 rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition-all duration-300 focus-within:border-[#D4AF37] focus-within:ring-4 focus-within:ring-[#D4AF37]/15 shadow-sm";
+  const inputField = "w-full bg-transparent text-sm font-bold text-[#0B1220] outline-none placeholder:text-[#6B7280]/50";
+  const labelClass = "text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] ml-1";
 
   return (
     <div
-      className={`fixed inset-0 z-[2000] bg-[#0F3D2E]/40 backdrop-blur-md transition-all duration-700 ease-in-out ${
+      className={`fixed inset-0 z-[9999] bg-[#0B1F3A]/55 backdrop-blur-xl transition-all duration-300 ease-out ${
         open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
       }`}
       onClick={onClose}
     >
       <div
-        className={`ml-auto h-full w-full max-w-[560px] bg-[#F8F5EF] shadow-strong transition-all duration-700 ease-out border-l border-[#C9A227]/10 flex flex-col ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`ml-auto h-full w-full max-w-[560px] bg-[#F8F5EF] shadow-2xl transition-all duration-300 ease-out border-l border-white/10 flex flex-col ${
+          open ? "translate-x-0 opacity-100 scale-100" : "translate-x-full opacity-0 scale-[0.98]"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="relative p-10 bg-[#0F3D2E] text-white overflow-hidden shrink-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(201,162,39,0.15),transparent_40%)] pointer-events-none" />
+        <div className="relative p-7 sm:p-9 bg-[#0B1F3A]/95 backdrop-blur-xl text-white overflow-hidden shrink-0 border-b border-white/10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.16),transparent_40%)] pointer-events-none" />
           <div className="relative z-10 flex items-start justify-between">
             <div className="space-y-4">
-              <h3 className="text-3xl font-bold tracking-tight">Account <span className="text-[#C9A227]">Settings</span></h3>
+              <h3 className="text-2xl sm:text-3xl font-bold tracking-tight">Account <span className="text-[#D4AF37]">Settings</span></h3>
             </div>
             <button
               onClick={onClose}
@@ -102,35 +102,35 @@ export default function AccountDrawer({ open, onClose }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-12">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 md:p-10 space-y-10">
           
           {/* Avatar Section */}
           <div className="flex flex-col items-center">
             <div className="relative group">
-              <div className="relative h-32 w-32 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl flex items-center justify-center bg-white p-1">
+              <div className="relative h-28 w-28 sm:h-32 sm:w-32 rounded-3xl overflow-hidden border-4 border-white shadow-2xl flex items-center justify-center bg-white p-1">
                 <img
-                  src={preview || `https://ui-avatars.com/api/?background=FAF7F0&color=C9A227&size=256&name=${encodeURIComponent(form.name || "User")}`}
+                  src={preview || `https://ui-avatars.com/api/?background=F8F5EF&color=D4AF37&size=256&name=${encodeURIComponent(form.name || "User")}`}
                   alt="Avatar"
-                  className="h-full w-full rounded-[2rem] object-cover"
+                  className="h-full w-full rounded-2xl object-cover"
                 />
               </div>
-              <label className="absolute -bottom-2 -right-2 h-12 w-12 bg-[#C9A227] text-white rounded-2xl flex items-center justify-center cursor-pointer shadow-2xl hover:bg-[#0F3D2E] transition-all duration-500 active:scale-95 border-4 border-[#F8F5EF]">
+              <label className="absolute -bottom-2 -right-2 h-12 w-12 bg-[#D4AF37] text-[#0B1220] rounded-2xl flex items-center justify-center cursor-pointer shadow-2xl hover:bg-[#0B1F3A] hover:text-white transition-all duration-300 active:scale-95 border-4 border-[#F8F5EF]">
                 <Camera size={20} />
                 <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </label>
             </div>
             <div className="mt-8 text-center">
-              <h4 className="text-xl font-bold text-[#0F3D2E] truncate px-6 leading-tight">{form.name || "User"}</h4>
+              <h4 className="text-xl font-bold text-[#0B1220] truncate px-6 leading-tight">{form.name || "User"}</h4>
             </div>
           </div>
 
           {/* Form Fields */}
           <div className="space-y-6">
             {[
-              { label: "Name", name: "name", type: "text", icon: <User size={20} className="text-[#C9A227]" />, ph: "Full name" },
-              { label: "Email", name: "email", type: "email", icon: <Mail size={20} className="text-[#C9A227]" />, ph: "Email address" },
-              { label: "Department", name: "department", type: "text", icon: <Building2 size={20} className="text-[#C9A227]" />, ph: "Team/Dept" },
-              { label: "Password", name: "password", type: "password", icon: <Lock size={20} className="text-[#C9A227]" />, ph: "New password (optional)" },
+              { label: "Name", name: "name", type: "text", icon: <User size={20} className="text-[#D4AF37]" />, ph: "Full name" },
+              { label: "Email", name: "email", type: "email", icon: <Mail size={20} className="text-[#D4AF37]" />, ph: "Email address" },
+              { label: "Department", name: "department", type: "text", icon: <Building2 size={20} className="text-[#D4AF37]" />, ph: "Team/Dept" },
+              { label: "Password", name: "password", type: "password", icon: <Lock size={20} className="text-[#D4AF37]" />, ph: "New password (optional)" },
             ].map((f) => (
               <div key={f.name} className="space-y-3">
                 <label className={labelClass}>{f.label}</label>
@@ -156,7 +156,7 @@ export default function AccountDrawer({ open, onClose }) {
             <button
               onClick={handleSave}
               disabled={loading}
-              className="w-full h-14 flex items-center justify-center gap-4 rounded-full bg-[#C9A227] text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-[#C9A227]/20 hover:bg-[#0F3D2E] hover:shadow-2xl hover:shadow-[#0F3D2E]/20 transition-all duration-500 active:scale-95 disabled:opacity-50"
+              className="w-full h-14 flex items-center justify-center gap-4 rounded-full bg-[#D4AF37] text-[#0B1220] font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-[#D4AF37]/25 hover:bg-[#0B1F3A] hover:text-white hover:shadow-2xl hover:shadow-[#0B1F3A]/20 transition-all duration-300 active:scale-95 disabled:opacity-50"
             >
               <Save size={18} />
               {loading ? "Saving..." : "Save Changes"}

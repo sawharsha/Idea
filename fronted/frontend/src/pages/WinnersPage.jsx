@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Trophy, History, Crown, Calendar, Sparkles, Vote, ChevronRight, ArrowLeft } from "lucide-react";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
-import winnersHero from "../assets/winners-hero.png";
+import { useAuth } from "../context/AuthContext";
 
 const buildCycles = (date = new Date()) => {
   const cycles = [];
@@ -112,11 +112,20 @@ const getUserPhoto = (idea) => {
 };
 
 export default function WinnersPage() {
+  const { userInfo } = useAuth();
+  const user = userInfo?.user;
+  const isAdmin =
+    user?.role === "admin" ||
+    user?.role === "superadmin" ||
+    userInfo?.role === "admin" ||
+    userInfo?.role === "superadmin";
+
   const [weeks, setWeeks] = useState([]);
   const [ideas, setIdeas] = useState([]);
   const [selectedCycleValue, setSelectedCycleValue] = useState("");
   const [winnerData, setWinnerData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectingWinnerId, setSelectingWinnerId] = useState("");
 
   useEffect(() => {
     fetchPageData();
@@ -211,6 +220,22 @@ export default function WinnersPage() {
     }
   };
 
+  const handleSelectWinner = async (ideaId) => {
+    if (!ideaId) return;
+
+    setSelectingWinnerId(ideaId);
+    try {
+      await api.post(`/ideas/select-winner/${ideaId}`);
+      await fetchWinner(selectedCycle.weekLabel);
+      await fetchPageData();
+    } catch (error) {
+      console.error("Select winner error:", error);
+      alert(error.response?.data?.message || "Unable to select winner.");
+    } finally {
+      setSelectingWinnerId("");
+    }
+  };
+
   const cycleIdeas = useMemo(() => {
     if (!selectedCycle) return [];
     return ideas.filter((idea) => isIdeaInCycle(idea, selectedCycle));
@@ -237,6 +262,27 @@ export default function WinnersPage() {
         message: now > selectedCycle.votingEnd
           ? "Winner will be announced on Monday @ 09:00 AM."
           : "Winner will be identified after voting closes.",
+      };
+    }
+
+    if (winnerData?.isTie) {
+      const tiedIdeas = (winnerData.topIdeas || winnerData.tieCandidates || [])
+        .map((candidate) => {
+          const candidateIdea = candidate.idea || candidate;
+          const fullIdea =
+            cycleIdeas.find((idea) => idea._id === candidateIdea._id) ||
+            candidateIdea;
+
+          return {
+            ...fullIdea,
+            votes: candidate.votes ?? getVoteCount(fullIdea),
+          };
+        });
+
+      return {
+        status: "tie",
+        message: "Tie detected. Admin must select winner.",
+        tiedIdeas,
       };
     }
 
@@ -269,7 +315,7 @@ export default function WinnersPage() {
 
       return {
         status: "tie",
-        message: "Tied result. Review in progress.",
+        message: "Tie detected. Admin must select winner.",
         tiedIdeas,
       };
     }
@@ -300,32 +346,32 @@ export default function WinnersPage() {
   }, [cycles, ideas, selectedCycle?.label]);
 
   return (
-    <div className="min-h-screen w-full bg-[#F8F5EF] text-[#1F2937] font-sans tracking-tight overflow-x-hidden selection:bg-[#D4AF37]/20 selection:text-[#0B1220]">
+    <div className="premium-page">
       <Navbar />
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6 md:space-y-8 animate-fade-in">
+      <main className="premium-shell animate-fade-in">
         
         {/* Hero Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-6 md:gap-8 rounded-[2rem] bg-[#0B1220] border border-[#D4AF37]/20 shadow-lg p-6 md:p-8 min-h-[280px] md:min-h-[340px] overflow-hidden relative group animate-fade-up">
+        <section className="premium-hero grid grid-cols-1 lg:grid-cols-2 items-center gap-8 min-h-[260px] md:min-h-[320px] group animate-fade-up">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.1),transparent_40%)] pointer-events-none" />
           <div className="space-y-6 relative z-10">
             <div className="space-y-3">
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] flex items-center gap-2">
                 <Sparkles size={14} /> Winners Circle
               </p>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight italic">Weekly <span className="text-[#D4AF37] not-italic">Champions.</span></h1>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight italic">Weekly <span className="text-[#D4AF37] not-italic">Champions.</span></h1>
               <div className="h-1 w-12 bg-[#D4AF37] rounded-full mt-4" />
             </div>
-            <p className="max-w-xl text-base sm:text-lg text-white/60 font-medium leading-relaxed italic">Celebrating the best ideas. View the winners of every cycle.</p>
+            <p className="max-w-xl text-sm md:text-base text-white/70 font-medium leading-relaxed italic">Celebrating the best ideas. View the winners of every cycle.</p>
           </div>
-          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-xl border border-[#D4AF37]/20 bg-[#111827] shadow-xl group/hero">
-            <img src={winnersHero} alt="" className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover object-center opacity-95 transition-transform duration-[2000ms] group-hover/hero:scale-110" />
+          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#111827] shadow-2xl group/hero">
+            <img src="/assests/winnerPage.png" alt="" className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover object-center opacity-95 transition-transform duration-[2000ms] group-hover/hero:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-tr from-[#0B1220]/70 via-transparent to-[#D4AF37]/15 pointer-events-none" />
           </div>
         </section>
 
         {/* Selection Bar */}
-        <section className="bg-white/95 rounded-2xl md:rounded-3xl border border-[#0B1220]/10 shadow-lg p-4 md:p-5 animate-fade-up">
+        <section className="premium-card p-4 md:p-5 animate-fade-up">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-lg bg-[#F8F5EF] text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/20 shadow-sm group">
@@ -345,7 +391,7 @@ export default function WinnersPage() {
               <select
                 value={selectedCycleValue}
                 onChange={(e) => setSelectedCycleValue(e.target.value)}
-                className="w-full rounded-lg border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-[#0B1220] outline-none transition-all duration-300 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/10 focus:bg-white cursor-pointer shadow-sm appearance-none"
+                className="w-full h-12 rounded-2xl premium-input px-5 pr-12 text-[10px] font-bold uppercase tracking-wider cursor-pointer shadow-sm appearance-none"
               >
                 {cycles.map((cycle) => (
                   <option key={cycle.label} value={cycle.label}>
@@ -361,7 +407,7 @@ export default function WinnersPage() {
         </section>
 
         {loading ? (
-          <div className="min-h-[480px] flex items-center justify-center rounded-[3rem] bg-white/80 border border-[#D4AF37]/10 animate-fade-in shadow-inner">
+          <div className="min-h-[320px] flex items-center justify-center rounded-3xl bg-white/80 border border-[#D4AF37]/10 animate-fade-in shadow-inner">
             <div className="flex flex-col items-center gap-6">
               <div className="h-20 w-20 rounded-full border-4 border-[#D4AF37]/10 border-t-[#D4AF37] animate-spin shadow-2xl" />
               <p className="text-[11px] font-black uppercase tracking-[0.6em] text-[#D4AF37] animate-pulse">Loading Winners Circle...</p>
@@ -369,13 +415,19 @@ export default function WinnersPage() {
           </div>
         ) : (
           <div className="space-y-20">
-            <WinnerResultCard result={winnerResult} selectedCycle={selectedCycle} />
+            <WinnerResultCard
+              result={winnerResult}
+              selectedCycle={selectedCycle}
+              isAdmin={isAdmin}
+              onSelectWinner={handleSelectWinner}
+              selectingWinnerId={selectingWinnerId}
+            />
 
             <section className="space-y-8 animate-fade-up">
               <div className="flex items-center justify-between gap-4 px-2">
                 <div className="space-y-1">
                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37]">Past Winners</p>
-                   <h2 className="text-2xl md:text-3xl font-black text-[#0B1220] tracking-tight">Previous Winners</h2>
+                   <h2 className="text-2xl md:text-3xl font-semibold text-[#0B1220] tracking-tight">Previous Winners</h2>
                    <div className="h-1 w-8 bg-[#D4AF37] rounded-full" />
                 </div>
                 <Calendar className="text-[#D4AF37]/30" size={32} />
@@ -384,7 +436,7 @@ export default function WinnersPage() {
               {previousWinners.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {previousWinners.map((winner) => (
-                    <div key={winner.idea._id} className="group rounded-2xl md:rounded-3xl bg-white/95 border border-[#0B1220]/10 p-4 md:p-5 flex items-center gap-4 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                    <div key={winner.idea._id} className="premium-card group p-4 md:p-5 flex items-center gap-4 relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full pointer-events-none" />
                       <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden border border-[#D4AF37]/20 p-0.5 bg-[#F8F5EF] shadow-sm">
                         <img
@@ -408,7 +460,7 @@ export default function WinnersPage() {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-[3rem] border-2 border-dashed border-[#D4AF37]/20 bg-[#F8F5EF]/60 py-32 text-center flex flex-col items-center justify-center shadow-inner group hover:border-[#D4AF37]/40 transition-all duration-700">
+                <div className="rounded-3xl border-2 border-dashed border-[#D4AF37]/20 bg-[#F8F5EF]/60 py-16 text-center flex flex-col items-center justify-center shadow-inner group hover:border-[#D4AF37]/40 transition-all duration-300 ease-out">
                    <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center text-[#D4AF37]/20 shadow-xl mb-8 group-hover:scale-110 transition-transform duration-500">
                     <History size={48} />
                   </div>
@@ -423,10 +475,10 @@ export default function WinnersPage() {
   );
 }
 
-function WinnerResultCard({ result, selectedCycle }) {
+function WinnerResultCard({ result, selectedCycle, isAdmin, onSelectWinner, selectingWinnerId }) {
   if (result.status !== "winner") {
     return (
-      <section className="rounded-2xl md:rounded-3xl bg-white/95 border border-[#D4AF37]/20 shadow-lg p-6 md:p-8 min-h-[280px] md:min-h-[340px] flex flex-col items-center justify-center text-center animate-fade-up relative overflow-hidden group">
+      <section className="premium-card p-6 md:p-8 min-h-[280px] md:min-h-[340px] flex flex-col items-center justify-center text-center animate-fade-up relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.05),transparent_60%)] pointer-events-none" />
         <div className="relative">
           <div className="absolute -inset-8 bg-[#D4AF37]/10 blur-3xl rounded-full" />
@@ -434,18 +486,28 @@ function WinnerResultCard({ result, selectedCycle }) {
             <Trophy size={40} />
           </div>
         </div>
-        <h2 className="text-2xl md:text-3xl font-black text-[#0B1220] tracking-tight leading-tight relative z-10">
+        <h2 className="text-2xl md:text-3xl font-semibold text-[#0B1220] tracking-tight leading-tight relative z-10">
           {result.message}
         </h2>
         {result.status === "tie" && (
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full relative z-10 animate-fade-in">
             {result.tiedIdeas.map((idea) => (
-              <div key={idea._id} className="group/tie rounded-xl bg-[#F8F5EF]/80 border border-[#0B1220]/5 p-4 flex items-center gap-4 text-left hover:bg-white hover:shadow-md transition-all duration-300">
+              <div key={idea._id} className="group/tie rounded-xl bg-[#F8F5EF]/80 border border-[#0B1F3A]/10 p-4 flex items-center gap-4 text-left hover:bg-white hover:shadow-md transition-all duration-300">
                 <img src={getUserPhoto(idea)} className="h-12 w-12 rounded-lg object-cover border border-[#D4AF37]/20 shadow-sm" alt="" />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-[#0B1220] truncate">{getUserName(idea)}</p>
                   <p className="text-[10px] font-medium text-[#1F2937]/45 truncate italic mt-0.5 leading-relaxed">"{idea.title}"</p>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#D4AF37] mt-2">{idea.votes || 0} Votes</p>
                 </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => onSelectWinner(idea._id)}
+                    disabled={selectingWinnerId === idea._id}
+                    className="shrink-0 px-4 py-2 rounded-full bg-[#D4AF37] text-[#0B1220] text-[9px] font-bold uppercase tracking-wider shadow-lg shadow-[#D4AF37]/25 hover:bg-[#0B1F3A] hover:text-white transition-all duration-300 disabled:opacity-50"
+                  >
+                    {selectingWinnerId === idea._id ? "Selecting..." : "Select as Winner"}
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -457,9 +519,9 @@ function WinnerResultCard({ result, selectedCycle }) {
   const idea = result.idea;
 
   return (
-    <section className="rounded-2xl bg-white/95 border border-[#D4AF37]/30 shadow-xl p-6 md:p-10 overflow-hidden relative animate-fade-up group">
+    <section className="premium-card p-6 md:p-10 overflow-hidden relative animate-fade-up group">
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full blur-[80px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#0B1220]/5 translate-y-1/2 -translate-x-1/2 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#0B1F3A]/5 translate-y-1/2 -translate-x-1/2 rounded-full blur-[80px] pointer-events-none" />
       
       <div className="relative grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] gap-10 items-center">
         <div className="relative flex items-center justify-center group/winner">
@@ -471,7 +533,7 @@ function WinnerResultCard({ result, selectedCycle }) {
               alt=""
             />
           </div>
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-[#0B1220] text-[#D4AF37] border-4 border-white h-16 w-16 flex items-center justify-center shadow-md transition-all duration-300 group-hover/winner:scale-110">
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-[#0B1F3A] text-[#D4AF37] border-4 border-white h-16 w-16 flex items-center justify-center shadow-md transition-all duration-300 group-hover/winner:scale-110">
             <Crown size={32} />
           </div>
         </div>
@@ -485,7 +547,7 @@ function WinnerResultCard({ result, selectedCycle }) {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-3xl md:text-5xl font-bold text-[#0B1220] tracking-tight leading-tight">
+            <h2 className="text-4xl md:text-5xl font-bold text-[#0B1220] tracking-tight leading-tight">
               {getUserName(idea)}
             </h2>
             <div className="flex items-center justify-center lg:justify-start gap-2 text-sm font-medium text-[#1F2937]/45 tracking-wider italic uppercase">
@@ -493,7 +555,7 @@ function WinnerResultCard({ result, selectedCycle }) {
             </div>
           </div>
 
-          <div className="rounded-xl bg-[#F8F5EF]/80 border border-[#0B1220]/5 p-6 md:p-8 shadow-inner group/idea transition-all duration-300 hover:bg-white hover:shadow-md">
+          <div className="rounded-xl bg-[#F8F5EF]/80 border border-[#0B1F3A]/10 p-6 md:p-8 shadow-inner group/idea transition-all duration-300 hover:bg-white hover:shadow-md">
             <p className="text-[9px] font-bold uppercase tracking-wider text-[#D4AF37] mb-3">
               Winning Idea
             </p>
@@ -506,7 +568,7 @@ function WinnerResultCard({ result, selectedCycle }) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-            <div className="rounded-xl bg-[#0B1220] text-white p-5 flex items-center gap-4 shadow-md transition-all duration-300 group/stats">
+            <div className="rounded-xl bg-[#0B1F3A] text-white p-5 flex items-center gap-4 shadow-md transition-all duration-300 group/stats">
               <div className="h-12 w-12 rounded-lg bg-[#D4AF37] text-[#0B1220] flex items-center justify-center shadow-sm transition-transform group-hover/stats:scale-110">
                 <Vote size={24} />
               </div>
@@ -516,7 +578,7 @@ function WinnerResultCard({ result, selectedCycle }) {
               </div>
             </div>
 
-            <div className="rounded-xl bg-[#F8F5EF] border border-[#0B1220]/10 p-5 flex items-center gap-4 shadow-sm transition-all duration-300 group/cycle">
+            <div className="rounded-xl bg-[#F8F5EF] border border-[#0B1F3A]/10 p-5 flex items-center gap-4 shadow-sm transition-all duration-300 group/cycle">
               <div className="h-12 w-12 rounded-lg bg-white text-[#D4AF37] flex items-center justify-center border border-[#D4AF37]/20 shadow-sm transition-transform group-hover/cycle:scale-110">
                 <Calendar size={24} />
               </div>

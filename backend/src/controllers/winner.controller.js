@@ -117,6 +117,10 @@ const getWinnersByWeek = async (req, res) => {
   const topIdeas = ideas.filter((idea) => (idea.likesCount || 0) === topVotes);
 
   if (topIdeas.length > 1) {
+    const formattedTopIdeas = topIdeas.map((idea, index) =>
+      formatWinnerIdea(idea, index + 1)
+    );
+
     return res.status(200).json(
       successResponse(
         "Multiple ideas have the same top votes. Admin must select the final winner.",
@@ -124,9 +128,8 @@ const getWinnersByWeek = async (req, res) => {
           weekLabel: selectedWeek,
           isTie: true,
           winnerPending: true,
-          tieCandidates: topIdeas.map((idea, index) =>
-            formatWinnerIdea(idea, index + 1)
-          ),
+          topIdeas: formattedTopIdeas,
+          tieCandidates: formattedTopIdeas,
           winners: [],
         }
       )
@@ -160,14 +163,6 @@ const selectWinner = async (req, res) => {
     throw error;
   }
 
-  const existingWinner = await Winner.findOne({ cycleLabel: idea.weekLabel });
-
-  if (existingWinner) {
-    const error = new Error("Winner already selected for this cycle");
-    error.statusCode = 400;
-    throw error;
-  }
-
   const cycleIdeas = await Idea.find({ weekLabel: idea.weekLabel }).sort({
     likesCount: -1,
     createdAt: 1,
@@ -185,13 +180,25 @@ const selectWinner = async (req, res) => {
     throw error;
   }
 
-  await Winner.create({
-    cycleLabel: idea.weekLabel,
-    idea: idea._id,
-    selectedBy: req.user._id,
-    selectionType: "manual",
-    reason: "Tie resolved by admin",
-  });
+  await Idea.updateMany(
+    { weekLabel: idea.weekLabel },
+    { $set: { isWinnerSelectedByAdmin: false } }
+  );
+
+  idea.isWinnerSelectedByAdmin = true;
+  await idea.save();
+
+  await Winner.findOneAndUpdate(
+    { cycleLabel: idea.weekLabel },
+    {
+      cycleLabel: idea.weekLabel,
+      idea: idea._id,
+      selectedBy: req.user._id,
+      selectionType: "manual",
+      reason: "Tie resolved by admin",
+    },
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  );
 
   res.status(200).json(
     successResponse("Winner selected successfully", {

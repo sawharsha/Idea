@@ -67,6 +67,10 @@ const ideaSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isWinnerSelectedByAdmin: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

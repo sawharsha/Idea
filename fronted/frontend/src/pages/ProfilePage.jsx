@@ -66,19 +66,19 @@ export default function ProfilePage() {
     }
   };
 
-  const inputWrap = "flex items-center gap-3 rounded-2xl border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-4 h-12 md:h-[52px] transition-all duration-300 focus-within:border-[#D4AF37] focus-within:ring-4 focus-within:ring-[#D4AF37]/10 focus-within:bg-white shadow-sm group";
-  const inputField = "w-full bg-transparent text-sm md:text-base font-bold text-[#0B1220] outline-none placeholder:text-[#1F2937]/20";
+  const inputWrap = "flex items-center gap-3 rounded-2xl premium-input px-4 h-12 shadow-sm group";
+  const inputField = "w-full bg-transparent text-sm md:text-base font-bold text-[#0B1220] outline-none placeholder:text-[#6B7280]/60";
   const labelClass = "text-xs font-bold uppercase tracking-[0.2em] text-[#D4AF37] ml-1 mb-1.5 block";
 
   return (
-    <div className="min-h-screen w-full bg-[#F8F5EF] font-sans tracking-tight text-[#1F2937] overflow-x-hidden selection:bg-[#D4AF37]/20 selection:text-[#0B1220]">
+    <div className="premium-page">
       <Navbar />
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-8 animate-fade-in">
+      <main className="premium-shell animate-fade-in">
         
         {/* Profile Card Section */}
-        <section className="bg-white rounded-2xl md:rounded-3xl border border-[#0B1220]/10 shadow-lg overflow-hidden animate-fade-up">
-          <div className="bg-[#0B1220] px-6 md:px-10 py-8 relative overflow-hidden group">
+        <section className="premium-card overflow-hidden animate-fade-up">
+          <div className="bg-[#0B1F3A] px-6 md:px-10 py-8 md:py-10 relative overflow-hidden group">
              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.1),transparent_40%)]" />
              
              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
@@ -100,8 +100,8 @@ export default function ProfilePage() {
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-[#D4AF37]">
                     <Sparkles size={12} /> Personal Idea Hub
                   </div>
-                  <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">Account <span className="text-[#D4AF37] italic">Settings.</span></h1>
-                  <p className="text-white/40 text-xs md:text-sm font-medium mt-1">Manage your profile and account preferences</p>
+                  <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">Account <span className="text-[#D4AF37] italic">Settings.</span></h1>
+                  <p className="text-sm md:text-base text-white/70 font-medium mt-1 leading-relaxed">Manage your profile and account preferences</p>
                 </div>
              </div>
           </div>
@@ -135,12 +135,12 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex flex-col justify-between space-y-6">
-                <div className="bg-[#F8F5EF] rounded-xl p-6 border border-[#D4AF37]/10 space-y-4 shadow-inner relative overflow-hidden group/summary">
+                <div className="rounded-3xl bg-[#F8F5EF] p-6 border border-[#D4AF37]/10 space-y-4 shadow-inner relative overflow-hidden group/summary">
                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#0B1220] flex items-center gap-2">
                      <ShieldCheck size={14} className="text-[#D4AF37]" /> Account Status
                    </h4>
                    <div className="space-y-3">
-                      <div className="flex justify-between items-center text-xs font-bold border-b border-[#0B1220]/5 pb-2">
+                      <div className="flex justify-between items-center text-xs font-bold border-b border-[#0B1F3A]/10 pb-2">
                         <span className="text-[#1F2937]/40 uppercase tracking-widest text-[8px]">Status</span>
                         <span className="text-[#0B1220] font-bold uppercase tracking-wider flex items-center gap-1.5">
                           <div className="h-1.5 w-1.5 bg-[#D4AF37] rounded-full animate-pulse" /> Active Member
@@ -157,7 +157,7 @@ export default function ProfilePage() {
                   <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="w-full px-5 py-3 md:py-4 flex items-center justify-center gap-2 rounded-full bg-[#0B1220] text-white font-bold uppercase tracking-wider text-sm shadow-md hover:bg-[#D4AF37] hover:text-[#0B1220] transition-all duration-300 active:scale-95 disabled:opacity-50"
+                    className="w-full px-5 py-2.5 md:py-3 flex items-center justify-center gap-2 rounded-full bg-[#D4AF37] text-[#0B1220] font-semibold uppercase tracking-wider text-sm shadow-xl shadow-[#D4AF37]/25 hover:bg-[#0B1F3A] hover:text-white hover:scale-105 transition-all duration-300 ease-out active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                   >
                     <Save size={16} />
                     {loading ? "Saving..." : "Save Changes"}
@@ -176,7 +176,7 @@ export default function ProfilePage() {
         </section>
 
         {/* Termination Section */}
-        <section className="bg-red-500/5 rounded-2xl md:rounded-3xl border border-red-500/10 p-6 flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-up">
+        <section className="rounded-3xl bg-white/95 border border-red-500/10 p-6 flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-up shadow-xl">
           <div className="space-y-0.5 text-center md:text-left">
             <h3 className="text-red-600 font-bold text-lg tracking-tight">Delete Account</h3>
             <p className="text-red-500/40 text-xs font-medium italic">Permanently remove your account and all associated data</p>

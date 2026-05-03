@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Lightbulb, Send, Trophy, User, LogOut, Menu, X, ChevronDown, PlusCircle, FileText } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import logo from "../assets/logo.png";
+
+const logo = "/assests/logo.png";
 
 export default function Navbar() {
   const { userInfo, logout } = useAuth();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const drawerRef = useRef(null);
+  const profileButtonRef = useRef(null);
 
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
@@ -19,10 +22,31 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        drawerRef.current &&
+        !drawerRef.current.contains(event.target) &&
+        profileButtonRef.current &&
+        !profileButtonRef.current.contains(event.target)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    setDropdownOpen(false);
+    setMenuOpen(false);
+  }, [location.pathname]);
+
   return (
-    <nav className="sticky top-0 z-[5000] w-full bg-[#0B1220]/95 border-b border-[#D4AF37]/20 shadow-lg backdrop-blur-xl transition-all duration-300">
+    <nav className="sticky top-0 z-50 w-full bg-[#0B1F3A]/95 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/20 transition-all duration-300 ease-out">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 md:h-[72px]">
+        <div className="flex justify-between items-center h-20">
 
           {/* Logo & Brand Block */}
           <Link to="/dashboard" className="flex shrink-0 items-center gap-3 group">
@@ -45,21 +69,19 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-4 lg:gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`relative px-4 py-2 rounded-lg text-sm font-semibold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 ${isActive(item.path)
-                  ? "text-[#D4AF37] bg-white/5"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+                className={`group/nav relative flex items-center gap-2 px-1 py-3 text-sm font-medium tracking-wide transition-all duration-300 ease-out ${isActive(item.path)
+                  ? "text-white"
+                  : "text-white/90 hover:text-white"
                   }`}
               >
                 {item.icon}
                 {item.name}
-                {isActive(item.path) && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#D4AF37] rounded-full shadow-[0_0_8px_rgba(212,175,55,0.6)]" />
-                )}
+                <span className={`absolute bottom-1 left-2 right-2 border-b-2 border-[#D4AF37] origin-left rounded-full transition-transform duration-300 ease-out ${isActive(item.path) ? "scale-x-100" : "scale-x-0 group-hover/nav:scale-x-100"}`} />
               </Link>
             ))}
           </div>
@@ -69,8 +91,9 @@ export default function Navbar() {
             {userInfo && (
               <div className="relative">
                 <button
+                  ref={profileButtonRef}
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 px-2 h-10 md:h-11 rounded-xl bg-white/5 border border-white/10 hover:border-[#D4AF37]/40 transition-all duration-300 group shadow-md"
+                  className="flex items-center gap-2 px-2 h-11 md:h-12 rounded-full bg-white/10 border border-white/15 hover:bg-white/15 transition-all duration-300 ease-out group shadow-lg shadow-black/20"
                 >
                   <div className="text-right hidden sm:block">
                     <p className="text-[8px] font-bold text-white/40 uppercase tracking-wider">Member</p>
@@ -80,19 +103,23 @@ export default function Navbar() {
                     <img
                       src={userInfo.user?.photoUrl || `https://ui-avatars.com/api/?background=D4AF37&color=0B1220&size=128&name=${encodeURIComponent(userInfo.user?.name)}`}
                       alt="Profile"
-                      className="h-8 w-8 rounded-lg object-cover border border-[#D4AF37]/20 group-hover:border-[#D4AF37] transition-all shadow-sm"
+                      className="h-8 w-8 rounded-full object-cover border border-[#D4AF37]/20 group-hover:border-[#D4AF37] transition-all shadow-sm"
                     />
-                    <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-[#D4AF37] rounded-md border border-[#0B1220] flex items-center justify-center text-[#0B1220]">
+                    <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-[#D4AF37] rounded-md border border-[#0B1220] flex items-center justify-center text-[#0B1220] shadow-[0_0_10px_rgba(212,175,55,0.45)]">
                       <ChevronDown size={8} className={`transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </div>
                 </button>
 
                 {/* Profile Dropdown (Premium Drawer Style) */}
-                {dropdownOpen && (
-                  <>
-                    <div className="fixed inset-0 z-[9998]" onClick={() => setDropdownOpen(false)} />
-                    <div className="absolute right-4 lg:right-0 top-full mt-2 w-64 bg-[#0B1220]/95 backdrop-blur-xl border border-[#D4AF37]/20 rounded-xl shadow-xl overflow-hidden animate-fade-up z-[9999]">
+                <div
+                  ref={drawerRef}
+                  className={`absolute right-0 top-full mt-3 w-[min(18rem,calc(100vw-2rem))] origin-top-right rounded-3xl bg-[#0B1F3A]/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-[#0B1F3A]/35 overflow-hidden z-[9999] transition-all duration-300 ease-out ${
+                    dropdownOpen
+                      ? "pointer-events-auto opacity-100 translate-y-0 scale-100"
+                      : "pointer-events-none opacity-0 -translate-y-2 scale-95"
+                  }`}
+                >
                       {/* Identity Section */}
                       <div className="p-5 border-b border-[#D4AF37]/10 bg-white/5 relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-tr from-[#D4AF37]/5 via-transparent to-transparent pointer-events-none" />
@@ -138,9 +165,7 @@ export default function Navbar() {
                           <LogOut size={16} /> Logout
                         </button>
                       </div>
-                    </div>
-                  </>
-                )}
+                </div>
               </div>
             )}
 
@@ -157,15 +182,15 @@ export default function Navbar() {
 
       {/* Mobile Navigation Overlay */}
       {menuOpen && (
-        <div className="lg:hidden fixed inset-0 top-20 md:top-24 bg-[#0B1220]/98 backdrop-blur-2xl z-[4999] animate-fade-in overflow-y-auto">
-          <div className="p-8 space-y-4">
+        <div className="lg:hidden fixed inset-0 top-20 bg-[#0B1F3A]/98 backdrop-blur-2xl z-40 animate-fade-in overflow-y-auto">
+          <div className="mx-auto max-w-2xl p-5 sm:p-8 space-y-3">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
                 onClick={() => setMenuOpen(false)}
-                className={`flex items-center gap-5 p-6 rounded-[2rem] text-sm font-black uppercase tracking-[0.25em] transition-all duration-300 ${isActive(item.path)
-                  ? "bg-[#D4AF37] text-[#0B1220] shadow-[0_20px_50px_rgba(212,175,55,0.3)] scale-[1.02]"
+                className={`flex items-center gap-4 p-5 rounded-2xl text-sm font-semibold tracking-wide transition-all duration-300 ease-out ${isActive(item.path)
+                  ? "bg-[#D4AF37] text-[#0B1220] shadow-[0_20px_50px_rgba(212,175,55,0.3)]"
                   : "text-white/60 hover:text-white bg-white/5"
                   }`}
               >

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Crown, Lightbulb, Vote, TrendingUp, Calendar, ChevronRight, Sparkles } from "lucide-react";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
-import dashboardHero from "../assets/dashboard-hero.png";
 
 const buildCycles = (date = new Date()) => {
   const cycles = [];
@@ -140,13 +139,13 @@ export default function DashboardPage() {
     }
   };
 
-  const cardStyle = "bg-white/95 rounded-2xl md:rounded-3xl border border-[#0B1220]/10 shadow-lg p-4 md:p-5 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group";
+  const cardStyle = "premium-card p-5 md:p-6 group relative overflow-hidden";
 
   return (
-    <div className="min-h-screen w-full bg-[#F8F5EF] text-[#1F2937] font-sans tracking-tight overflow-x-hidden selection:bg-[#D4AF37]/20 selection:text-[#0B1220]">
+    <div className="premium-page">
       <Navbar />
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-8 animate-fade-in">
+      <main className="premium-shell animate-fade-in">
         
         {/* 1. Weekly Winner - First Priority */}
         <section className="space-y-4 animate-fade-up">
@@ -155,7 +154,7 @@ export default function DashboardPage() {
             <div className="h-px flex-1 bg-gradient-to-r from-[#D4AF37]/40 to-transparent" />
           </div>
           
-          <div className="bg-[#0B1220] rounded-[2rem] p-6 md:p-8 min-h-[280px] md:min-h-[340px] flex flex-col justify-center text-white relative overflow-hidden shadow-xl border border-[#D4AF37]/20 group">
+          <div className="premium-hero min-h-[260px] md:min-h-[320px] flex flex-col justify-center text-white group">
             {/* Background Texture/Gradient */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(212,175,55,0.08),transparent_40%)] pointer-events-none" />
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -184,7 +183,7 @@ export default function DashboardPage() {
                         {winner.selectionType === "manual" ? "Admin Final Winner" : "Weekly Champion"}
                       </span>
                     </div>
-                    <h3 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                    <h3 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
                       {winner.idea.createdBy?.name || winner.idea.user?.name || "Winner"}
                     </h3>
                     <p className="text-white/60 text-sm md:text-base font-medium italic line-clamp-2 max-w-xl">
@@ -209,7 +208,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="relative z-10 py-16 flex flex-col items-center gap-8 text-center">
+              <div className="relative z-10 py-10 md:py-12 flex flex-col items-center gap-6 text-center">
                 <div className="relative">
                    <div className="absolute -inset-8 bg-[#D4AF37]/5 blur-3xl rounded-full" />
                    <div className="h-32 w-32 rounded-full bg-white/5 flex items-center justify-center text-[#D4AF37]/40 border-2 border-dashed border-[#D4AF37]/20 shadow-inner group-hover:scale-105 transition-transform">
@@ -217,7 +216,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                  <h3 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
                     {winner?.message || "Next Winner Announcement"}
                   </h3>
                   {winner?.cycle && (
@@ -238,33 +237,33 @@ export default function DashboardPage() {
         </section>
 
         {/* 2. Dashboard Hero Banner - Second Priority */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-6 md:gap-8 rounded-[2rem] bg-white border border-[#0B1220]/5 shadow-sm p-6 md:p-8 min-h-[280px] md:min-h-[340px] overflow-hidden relative group animate-fade-up">
-          <div className="absolute top-0 left-0 w-full h-full bg-[#F8F5EF]/30 pointer-events-none" />
+        <section className="premium-hero grid grid-cols-1 lg:grid-cols-2 items-center gap-8 min-h-[260px] md:min-h-[320px] group animate-fade-up">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.1),transparent_40%)] pointer-events-none" />
           <div className="space-y-6 relative z-10">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0B1220]/5 border border-[#0B1220]/10 text-[9px] font-bold uppercase tracking-wider text-[#0B1220]">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-[#D4AF37]">
                 <Sparkles size={14} className="text-[#D4AF37]" /> SIVION Idea Hub
               </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-[#0B1220] leading-tight">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
                 Fuel Your <br /> <span className="text-[#D4AF37] italic">Ideas.</span>
               </h1>
               <div className="h-1 w-12 bg-[#D4AF37] rounded-full" />
             </div>
-            <p className="max-w-md text-[#1F2937]/70 text-base md:text-lg font-medium leading-relaxed">
+            <p className="max-w-md text-sm md:text-base text-white/70 font-medium leading-relaxed">
               Orchestrate the future of tech. Submit ideas, cast votes, and rise through the cycles.
             </p>
             <div className="flex pt-4">
-              <Link to="/submit-idea" className="px-8 py-3 bg-[#0B1220] text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-md hover:bg-[#D4AF37] hover:text-[#0B1220] transition-all duration-300 active:scale-95">
+              <Link to="/submit-idea" className="px-5 py-2.5 bg-[#D4AF37] text-[#0B1220] rounded-full text-sm font-medium tracking-wide shadow-xl shadow-[#D4AF37]/25 hover:bg-white hover:text-[#0B1220] hover:scale-105 transition-all duration-300 ease-out active:scale-95">
                 Submit Idea
               </Link>
             </div>
           </div>
  
-            <div className="relative overflow-hidden rounded-xl border border-[#0B1220]/5 bg-[#0B1220] shadow-md h-auto max-h-[280px] md:max-h-[340px] group/hero">
+          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#111827] shadow-2xl group/hero">
             <img
-              src={dashboardHero}
+              src="/assests/dashboard.png"
               alt="Dashboard visual"
-              className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover opacity-90 transition-transform duration-[2000ms] group-hover/hero:scale-110"
+              className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover object-center opacity-90 transition-transform duration-[2000ms] group-hover/hero:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-[#0B1220]/80 via-transparent to-[#D4AF37]/10 pointer-events-none" />
           </div>

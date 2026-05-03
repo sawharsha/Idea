@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Send, Upload, CheckCircle2, AlertCircle, Sparkles, ChevronLeft, FileText, Lightbulb, User, Calendar } from "lucide-react";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
-import ideasHero from "../assets/ideas-hero.png";
 import { useAuth } from "../context/AuthContext";
 
 const buildCycles = (date = new Date()) => {
@@ -101,6 +100,10 @@ export default function SubmitIdeaPage() {
     e.preventDefault();
     if (!isSubmissionOpen) return alert("Submissions are closed for the current cycle.");
     if (hasSubmittedInCurrentCycle) return;
+    if (!file) {
+      setError("Please upload a file before submitting your idea.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -145,30 +148,30 @@ export default function SubmitIdeaPage() {
     );
   }
 
-  const inputClass = "w-full h-12 md:h-[52px] px-4 bg-[#F8F5EF]/70 border border-[#0B1220]/10 rounded-2xl outline-none text-sm md:text-base font-bold text-[#0B1220] placeholder:text-[#1F2937]/20 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/10 focus:bg-white transition-all duration-300 shadow-sm";
+  const inputClass = "w-full h-12 px-4 rounded-xl premium-input text-sm md:text-base font-medium placeholder:text-[#6B7280]/60 shadow-sm";
   const labelClass = "text-xs font-bold uppercase tracking-[0.2em] text-[#D4AF37] ml-1 block mb-2";
 
   return (
-    <div className="min-h-screen w-full bg-[#F8F5EF] font-sans tracking-tight text-[#1F2937] overflow-x-hidden selection:bg-[#D4AF37]/20 selection:text-[#0B1220]">
+    <div className="premium-page">
       <Navbar />
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6 md:space-y-8 animate-fade-in">
+      <main className="premium-shell animate-fade-in">
         
         {/* Hero Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-6 md:gap-8 rounded-[2rem] bg-[#0B1220] border border-[#D4AF37]/20 shadow-lg p-6 md:p-8 min-h-[280px] md:min-h-[340px] overflow-hidden relative group animate-fade-up">
+        <section className="premium-hero grid grid-cols-1 lg:grid-cols-2 items-center gap-8 min-h-[260px] md:min-h-[320px] group animate-fade-up">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.1),transparent_40%)] pointer-events-none" />
           <div className="space-y-6 relative z-10">
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-[#D4AF37]">
                 <Sparkles size={14} /> Idea Portal
               </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight italic">Share Your <span className="text-[#D4AF37] not-italic">Idea.</span></h1>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight italic">Share Your <span className="text-[#D4AF37] not-italic">Idea.</span></h1>
               <div className="h-1 w-12 bg-[#D4AF37] rounded-full mt-4" />
             </div>
-            <p className="max-w-xl text-base sm:text-lg text-white/60 font-medium leading-relaxed italic">Enter your idea. Define the future. Submit your idea for community voting.</p>
+            <p className="max-w-xl text-sm md:text-base text-white/70 font-medium leading-relaxed italic">Enter your idea. Define the future. Submit your idea for community voting.</p>
           </div>
-          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-xl border border-[#D4AF37]/20 bg-[#111827] shadow-xl group/hero">
-            <img src={ideasHero} alt="" className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover object-center opacity-95 transition-transform duration-[2000ms] group-hover/hero:scale-110" />
+          <div className="relative h-auto max-h-[280px] md:max-h-[340px] overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#111827] shadow-2xl group/hero">
+            <img src="/assests/submitPage.png" alt="" className="w-full h-auto max-h-[280px] md:max-h-[340px] object-cover object-center opacity-95 transition-transform duration-[2000ms] group-hover/hero:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-tr from-[#0B1220]/70 via-transparent to-[#D4AF37]/15 pointer-events-none" />
           </div>
         </section>
@@ -178,12 +181,12 @@ export default function SubmitIdeaPage() {
             <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#1F2937]/40 hover:text-[#0B1220] transition-colors group">
               <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" /> Return
             </button>
-            <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-wider text-[#D4AF37] bg-white px-6 py-2 rounded-xl shadow-sm border border-[#0B1220]/5">
+            <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-wider text-[#D4AF37] bg-white px-6 py-2 rounded-xl shadow-sm border border-[#0B1F3A]/10">
               <Calendar size={14} /> {currentCycle?.label || "Calculating Cycle..."}
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-white/95 rounded-2xl md:rounded-3xl border border-[#0B1220]/10 shadow-lg p-6 md:p-8 space-y-6 md:space-y-8 relative overflow-hidden">
+          <form onSubmit={handleSubmit} className="premium-card p-6 md:p-8 space-y-6 md:space-y-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full pointer-events-none" />
             
             {/* Title & Category Row */}
@@ -227,7 +230,7 @@ export default function SubmitIdeaPage() {
 
             {/* Upload Area */}
             <div className="space-y-3">
-              <label className={labelClass}><Upload size={14} className="inline mr-1" /> Additional Files (Optional)</label>
+              <label className={labelClass}><Upload size={14} className="inline mr-1" /> Additional Files</label>
               <div className="relative group">
                 <input
                   type="file"
@@ -263,7 +266,7 @@ export default function SubmitIdeaPage() {
                     <h3 className="text-lg font-bold tracking-tight text-[#0B1220]">
                       Submission limit reached.
                     </h3>
-                    <p className="text-xs leading-relaxed text-[#1F2937]/60 font-medium italic">
+                    <p className="text-xs leading-relaxed text-[#6B7280] font-medium italic">
                       "You have already submitted an idea for this cycle. Only one idea per user is allowed to ensure fair voting."
                     </p>
                   </div>
@@ -275,7 +278,7 @@ export default function SubmitIdeaPage() {
               <button
                 type="submit"
                 disabled={loading || !isSubmissionOpen || hasSubmittedInCurrentCycle}
-                className="w-full px-5 py-3 md:py-4 flex items-center justify-center gap-3 rounded-full bg-[#0B1220] text-white font-bold uppercase tracking-wider text-sm shadow-md transition-all duration-300 hover:bg-[#D4AF37] hover:text-[#0B1220] active:scale-95 disabled:bg-[#D4AF37]/30 disabled:text-[#0B1220]/30 disabled:cursor-not-allowed disabled:shadow-none"
+                className="w-full px-5 py-2.5 md:py-3 flex items-center justify-center gap-3 rounded-full bg-[#D4AF37] text-[#0B1220] font-semibold uppercase tracking-wider text-sm shadow-xl shadow-[#D4AF37]/25 transition-all duration-300 ease-out hover:bg-[#0B1F3A] hover:text-white hover:scale-105 active:scale-95 disabled:bg-[#D4AF37]/30 disabled:text-[#0B1220]/30 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100"
               >
                 {loading ? "Submitting..." : "Submit Idea"}
                 <Send size={18} className="group-hover:translate-x-1 transition-transform" />

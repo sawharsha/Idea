@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, LockKeyhole, Mail, Sparkles, ShieldCheck } from "lucide-react";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
-import logo from "../assets/logo.png";
+
+const logo = "/assests/logo.png";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -31,13 +32,13 @@ export default function LoginPage() {
   };
 
   const labelClass = "text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] mb-2 block ml-1";
-  const inputClass = "w-full rounded-lg border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-5 py-4 text-sm font-bold text-[#0B1220] outline-none transition-all duration-300 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/10 focus:bg-white placeholder:text-[#1F2937]/20 shadow-sm group";
+  const inputClass = "w-full h-12 rounded-xl premium-input px-4 text-sm font-medium placeholder:text-[#6B7280]/60 shadow-sm group";
 
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2 overflow-x-hidden bg-[#F8F5EF] font-sans selection:bg-[#D4AF37]/20 selection:text-[#0B1220]">
 
       {/* Left Hero Section */}
-      <section className="relative flex min-h-screen flex-col justify-center bg-[#0B1220] px-6 sm:px-10 lg:px-14 py-8 overflow-hidden animate-fade-in">
+      <section className="relative flex min-h-screen flex-col justify-center bg-[#0B1F3A] px-6 md:px-12 xl:px-20 py-10 md:py-16 overflow-hidden animate-fade-in">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(212,175,55,0.1),transparent_40%)] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0B1220] to-transparent z-10" />
 
@@ -53,7 +54,7 @@ export default function LoginPage() {
               </div>
 
               <div className="leading-none">
-                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
                   SIVION <span className="text-[#D4AF37]">GLOBAL</span>
                 </h1>
                 <p className="mt-2 text-xs font-bold uppercase tracking-[0.4em] text-white/70">
@@ -68,12 +69,12 @@ export default function LoginPage() {
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-[#D4AF37]">
                 <ShieldCheck size={14} /> Secure Portal
               </div>
-              <h2 className="text-3xl sm:text-5xl xl:text-6xl font-bold tracking-tight leading-tight text-white">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white">
                 Access Your <br /> <span className="text-[#D4AF37] italic">Idea Hub.</span>
               </h2>
             </div>
 
-            <p className="max-w-md text-base sm:text-lg leading-relaxed text-white/60 font-medium italic">
+            <p className="max-w-md text-sm md:text-base leading-relaxed text-white/60 font-medium italic">
               "Join the global innovation stream. Log in to manage your ideas and vote on the future."
             </p>
 
@@ -96,12 +97,12 @@ export default function LoginPage() {
       </section>
 
       {/* Right Form Section */}
-      <section className="flex items-center justify-center px-6 sm:px-10 lg:px-20 py-12 lg:py-0 bg-[#F8F5EF] animate-fade-in">
-        <div className="w-full max-w-md rounded-2xl bg-white border border-[#D4AF37]/20 shadow-lg p-8 sm:p-10 lg:p-12 relative overflow-hidden group">
+      <section className="flex items-center justify-center px-6 md:px-12 xl:px-20 py-10 md:py-16 bg-[#F8F5EF] animate-fade-in">
+        <div className="w-full max-w-md premium-card p-8 sm:p-10 lg:p-12 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4AF37]/5 -translate-y-1/2 translate-x-1/2 rounded-full pointer-events-none" />
 
           <div className="mb-10 relative z-10">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0B1220]">Login</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#0B1220]">Login</h2>
             <div className="mt-4 h-1.5 w-12 bg-[#D4AF37] rounded-full" />
           </div>
 
@@ -156,7 +157,7 @@ export default function LoginPage() {
 
             <button
               disabled={loading}
-              className="w-full h-14 flex items-center justify-center gap-3 rounded-lg bg-[#0B1220] text-white font-bold uppercase tracking-wider text-sm shadow-md transition-all duration-300 hover:bg-[#D4AF37] hover:text-[#0B1220] active:scale-95 disabled:opacity-50"
+              className="w-full h-12 flex items-center justify-center gap-3 rounded-full bg-[#D4AF37] text-[#0B1220] font-semibold tracking-wide text-sm shadow-xl shadow-[#D4AF37]/25 transition-all duration-300 ease-out hover:bg-[#0B1F3A] hover:text-white hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
             >
               {loading ? "Logging in..." : "Login"} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>

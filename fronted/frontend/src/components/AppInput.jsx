@@ -6,9 +6,9 @@ export default function AppInput({
   ...props
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {label && (
-        <label className="text-[11px] font-black uppercase tracking-[0.4em] text-[#D4AF37] ml-2 block">
+        <label className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37] ml-1 block">
           {label}
         </label>
       )}
@@ -19,7 +19,7 @@ export default function AppInput({
           </div>
         )}
         <input
-          className={`w-full rounded-lg border border-[#0B1220]/10 bg-[#F8F5EF]/70 px-4 py-3 text-sm font-medium text-[#0B1220] outline-none transition-all duration-300 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/10 focus:bg-white placeholder:text-[#1F2937]/30 shadow-sm ${icon ? 'pl-12' : ''} ${className}`}
+          className={`w-full h-12 premium-input px-4 text-sm font-medium ${icon ? 'pl-12' : ''} ${className}`}
           {...props}
         />
       </div>

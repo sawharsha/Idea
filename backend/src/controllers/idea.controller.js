@@ -87,6 +87,10 @@ const createIdea = async (req, res) => {
   const currentWeekLabel = cycleWindow.submissionCycleLabel;
   const submissionCycle = cycleWindow.submissionCycle;
 
+  if (!req.file) {
+    return res.status(400).json({ message: "Please upload a file before submitting your idea." });
+  }
+
   const alreadySubmitted = await Idea.findOne({
     createdBy: req.user._id,
     createdAt: {
@@ -198,7 +202,7 @@ const getIdeasByUser = async (req, res) => {
 const updateIdea = async (req, res) => {
   console.log("Uploaded file:", req.file);
   const { id } = req.params;
-  const { title, description, type } = req.body;
+  const { title, description, type, category } = req.body;
   const cycleWindow = getCurrentCycleWindow();
 
   const idea = await Idea.findById(id);
@@ -209,30 +213,30 @@ const updateIdea = async (req, res) => {
     throw error;
   }
 
-  if (
-    !cycleWindow.isSubmissionOpen ||
-    idea.weekLabel !== cycleWindow.submissionCycleLabel
-  ) {
-    const error = new Error(
-      "Idea submission is currently closed. Please wait for the next submission cycle."
-    );
-    error.statusCode = 403;
-    throw error;
-  }
+  const isOwner = idea.createdBy.toString() === req.user._id.toString();
 
-  const isAdminOwner =
-    req.user.role === "admin" &&
-    idea.createdBy.toString() === req.user._id.toString();
-
-  if (!isAdminOwner) {
+  if (!isOwner) {
     const error = new Error("You are not allowed to edit ideas.");
     error.statusCode = 403;
     throw error;
   }
 
+  const { findCycleForDate } = require("../utils/cycleWindow");
+  const ideaCycle = findCycleForDate(idea.createdAt);
+  const now = new Date();
+  
+  const isSubmissionOpen = ideaCycle && now >= ideaCycle.submissionStart && now <= ideaCycle.submissionClose;
+
+  if (!isSubmissionOpen) {
+    const error = new Error("You can edit your idea only during the submission period.");
+    error.statusCode = 400;
+    throw error;
+  }
+
   if (title !== undefined) idea.title = title;
   if (description !== undefined) idea.description = description;
-  if (type !== undefined) idea.type = type;
+  const nextType = category ?? type;
+  if (nextType !== undefined) idea.type = nextType;
 
   if (req.file) {
     const fileData = getUploadedFileData(req.file);
@@ -261,8 +265,10 @@ const deleteIdea = async (req, res) => {
     throw error;
   }
 
-  if (req.user.role !== "admin") {
-    const error = new Error("You are not allowed to delete ideas.");
+  const isAdmin = req.user.role === "admin" || req.user.role === "superadmin";
+
+  if (!isAdmin) {
+    const error = new Error("Only admin can delete ideas.");
     error.statusCode = 403;
     throw error;
   }
@@ -287,7 +293,12 @@ const toggleLikeIdea = async (req, res) => {
     throw error;
   }
 
-  const ideaCycleWindow = getCycleWindowByLabel(idea.weekLabel, now);
+  const { findCycleForDate } = require("../utils/cycleWindow");
+  let ideaCycleWindow = getCycleWindowByLabel(idea.weekLabel, now);
+
+  if (!ideaCycleWindow) {
+    ideaCycleWindow = findCycleForDate(idea.createdAt);
+  }
 
   if (
     !ideaCycleWindow ||
@@ -305,11 +316,33 @@ const toggleLikeIdea = async (req, res) => {
     (userId) => userId.toString() === req.user._id.toString()
   );
 
+  if (idea.createdBy.toString() === req.user._id.toString() && !alreadyLiked) {
+    const error = new Error("You cannot vote for your own idea.");
+    error.statusCode = 400;
+    throw error;
+  }
+
   if (alreadyLiked) {
     idea.likes = idea.likes.filter(
       (userId) => userId.toString() !== req.user._id.toString()
     );
   } else {
+    const alreadyVotedIdea = await Idea.findOne({
+      createdAt: {
+        $gte: ideaCycleWindow.submissionStart,
+        $lte: ideaCycleWindow.votingEnd,
+      },
+      likes: req.user._id,
+    });
+
+    if (alreadyVotedIdea) {
+      const error = new Error(
+        "You can vote only one idea per cycle. Unvote first to vote another idea."
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
     idea.likes.push(req.user._id);
   }
 
